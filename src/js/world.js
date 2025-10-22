@@ -117,30 +117,41 @@ export class World extends THREE.Group {
      */
     generateMeshes(){
         this.clear();
+
         const maxCount = this.size.width * this.size.width * this.size.height;
-        const mesh = new THREE.InstancedMesh(geometry, material, maxCount);
-        mesh.count = 0;
+        
+        const meshes = {};
+        Object.values(blocks)
+        .filter(blockType => blockType.id !== blocks.empty.id)
+        .forEach(blockType => {
+            const mesh = new THREE.InstancedMesh(geometry, blockType.material, maxCount);
+            mesh.count = 0;
+            mesh.name = blockType.name;
+            meshes[blockType.id] = mesh; 
+        });
+
         
         const matrix = new THREE.Matrix4();
         for(let x = 0; x < this.size.width; x++){
             for(let y = 0; y < this.size.height; y++){
                 for(let z = 0; z < this.size.width; z++){
                     const blockId = this.getBlock(x, y, z).id;
-                    const blockType = Object.values(blocks).find(x => x.id === blockId);
+                    
+                    if(blockId === blocks.empty.id) continue;
+
+                    const mesh = meshes[blockId];
                     const blockInstanceId = mesh.count;
 
-                    if(blockId !== blocks.empty.id && !this.isBlockObscured(x, y, z)){
+                    if(!this.isBlockObscured(x, y, z)){
                         matrix.setPosition(x + 0.5, y + 0.5, z + 0.5);
                         mesh.setMatrixAt(blockInstanceId, matrix);
-                        mesh.setColorAt(blockInstanceId, new THREE.Color(blockType.color));
                         this.setBlockInstanceId(x, y, z, blockInstanceId);
                         mesh.count++;
                     }
                 }
             }
         }
-
-        this.add(mesh);
+        this.add(...Object.values(meshes));
     }
 
     /**
