@@ -33,7 +33,8 @@ controls.update();
  */
 const scene = new THREE.Scene();
 const world = new World();
-world.generate();
+world.generateTerrain();
+world.generateMeshes();
 scene.add(world);
 
 //add light
