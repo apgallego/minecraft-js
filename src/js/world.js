@@ -120,13 +120,16 @@ export class World extends THREE.Group {
 
         const maxCount = this.size.width * this.size.width * this.size.height;
         
+        //createa a lookup table where the key is the block id and the value is the instanced mesh
         const meshes = {};
         Object.values(blocks)
         .filter(blockType => blockType.id !== blocks.empty.id)
         .forEach(blockType => {
             const mesh = new THREE.InstancedMesh(geometry, blockType.material, maxCount);
-            mesh.count = 0;
             mesh.name = blockType.name;
+            mesh.count = 0;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
             meshes[blockType.id] = mesh; 
         });
 

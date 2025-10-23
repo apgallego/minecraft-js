@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { World } from './js/world.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { createUI } from './js/ui.js';
+import { shadow } from 'three/tsl';
 
 const stats = new Stats();
 document.body.appendChild(stats.dom);
@@ -14,6 +15,8 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x80a0ef); //sky blue
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 /**
@@ -38,13 +41,23 @@ scene.add(world);
 
 //add light
 const setupLights = () => {
-    const l1 = new THREE.DirectionalLight();
-    l1.position.set(1, 1, 1);
-    scene.add(l1);
+    const sun = new THREE.DirectionalLight();
+    sun.position.set(50, 50, 50);
+    sun.castShadow = true;
+    sun.shadow.camera.left = -50;
+    sun.shadow.camera.right = 50;
+    sun.shadow.camera.bottom = -50;
+    sun.shadow.camera.top = 50;
+    sun.shadow.camera.near = 0.1;
+    sun.shadow.camera.far = 100;
+    sun.shadow.bias = -0.0005;
+    sun.shadow.mapSize = new THREE.Vector2(1024, 1024);
 
-    const l2 = new THREE.DirectionalLight();
-    l2.position.set(-1, 1, -0.5);
-    scene.add(l2);
+    scene.add(sun);
+
+    // shows the light source (for debugging)
+    const shadowHelper = new THREE.CameraHelper(sun.shadow.camera);
+    scene.add(shadowHelper);
 
     const ambient = new THREE.AmbientLight();
     ambient.intensity = 0.1;
