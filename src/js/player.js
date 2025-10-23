@@ -9,13 +9,18 @@ export class Player{
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
     controls = new PointerLockControls(this.camera, document.body);
 
+    cameraHelper = new THREE.CameraHelper(this.camera);
+
     /**
      * @param {THREE.Scene} scene 
      */
     constructor(scene){
         this.position.set(32, 16, 32);
         scene.add(this.camera);
-
+        
+        //for debugging
+        scene.add(this.cameraHelper);
+        
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
     }
