@@ -90,6 +90,6 @@ export class Player{
      * @return {string}
      */
     toString(){
-        return `[X]: ${this.position.x}, [Y]: ${this.position.y}, [Z]: ${this.position.z}`;
+        return `[X]: ${this.position.x.toFixed(2)}, [Y]: ${this.position.y.toFixed(2)}, [Z]: ${this.position.z.toFixed(2)}`;
     }
 }
