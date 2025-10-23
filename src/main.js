@@ -4,6 +4,7 @@ import { World } from './js/world.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { createUI } from './js/ui.js';
 import { shadow } from 'three/tsl';
+import { Player } from './js/player.js';
 
 const stats = new Stats();
 document.body.appendChild(stats.dom);
@@ -39,6 +40,8 @@ const world = new World();
 world.generate();
 scene.add(world);
 
+const player = new Player(scene);
+
 //add light
 const setupLights = () => {
     const sun = new THREE.DirectionalLight();
@@ -56,8 +59,8 @@ const setupLights = () => {
     scene.add(sun);
 
     // shows the light source (for debugging)
-    const shadowHelper = new THREE.CameraHelper(sun.shadow.camera);
-    scene.add(shadowHelper);
+    // const shadowHelper = new THREE.CameraHelper(sun.shadow.camera);
+    // scene.add(shadowHelper);
 
     const ambient = new THREE.AmbientLight();
     ambient.intensity = 0.1;
@@ -67,13 +70,17 @@ const setupLights = () => {
 /**
  * Render loop
  */
+let previousTime = performance.now();
 const animate = () => {
+    let currentTime = performance.now();
+    let deltaTime = (currentTime - previousTime) / 1000;
+
     requestAnimationFrame(animate);
-    // cube.rotation.x += 0.01;
-    // cube.rotation.y += 0.01;
-    // cube.rotation.z += 0.01;
-    renderer.render(scene, camera);
+    player.applyInputs(deltaTime);
+    renderer.render(scene, player.camera);
     stats.update();
+
+    previousTime = currentTime;
 };
 
 window.addEventListener('resize', () => {
@@ -85,5 +92,5 @@ window.addEventListener('resize', () => {
 
 // -- init --
 setupLights();
-createUI(world);
+createUI(world, player);
 animate();
