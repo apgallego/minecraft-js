@@ -77,9 +77,7 @@ const animate = () => {
     let currentTime = performance.now();
     let deltaTime = (currentTime - previousTime) / 1000;
 
-    requestAnimationFrame(animate);
-    player.applyInputs(deltaTime);
-    player.updateBoundsHelper();
+    requestAnimationFrame(animate);    
     physics.update(deltaTime, player, world);
     renderer.render(scene, player.controls.isLocked ? player.camera : orbitCamera);
     stats.update();
