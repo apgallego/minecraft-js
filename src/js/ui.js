@@ -12,8 +12,8 @@ export function createUI(world, player){
 
     const terrainFolder = gui.addFolder("Terrain");
     terrainFolder.add(world.params, 'seed', 10, 10000).name("Seed");
-    terrainFolder.add(world.size, 'width', 8, 128, 1).name("Width");
-    terrainFolder.add(world.size, 'height', 8, 64, 1).name("Height");
+    terrainFolder.add(world.chunkSize, 'width', 8, 128, 1).name("Width");
+    terrainFolder.add(world.chunkSize, 'height', 8, 64, 1).name("Height");
     terrainFolder.add(world.params.terrain, 'scale', 10, 100).name("Scale");
     terrainFolder.add(world.params.terrain, 'magnitude', 0, 1).name("Magnitude");
     terrainFolder.add(world.params.terrain, 'offset', 0, 1).name("Offset");

@@ -85,8 +85,6 @@ export class Physics {
             }
         }
 
-        console.log("Broadphase Candidates" + candidates.length);
-
         return candidates;
     }
 
@@ -137,8 +135,6 @@ export class Physics {
                 this.addContactPointHelper(closestPoint);
             }
         }
-
-        console.log('Narrow Collisions: ' + collisions.length);
 
         return collisions;
     }
