@@ -3,13 +3,15 @@ import { WorldChunk } from './worldChunk';
 
 export class World extends THREE.Group {
 
+    asyncLoading = true; //for chunks
+
     //the number of chunks to render around the player
     //if 0, only renders the chunk where the player is
     //if n > 0, adjacent chunks are rendered
     drawDistance = 1;
     
     //to separate chunks in case of debugging visually
-    chunkSpacing = 1;
+    chunkSpacing = 0;
 
     chunkSize = {
         width: 64,
@@ -118,7 +120,6 @@ export class World extends THREE.Group {
         // Eliminar los chunks no usados
         chunksToRemove.forEach(chunk => {
             this.remove(chunk);
-            console.log(`removed chunk at X: ${chunk.userData.x}, Z: ${chunk.userData.z}`);
         });
     }
 
@@ -135,9 +136,13 @@ export class World extends THREE.Group {
             z * (this.chunkSize.width + this.chunkSpacing)
         );
         chunk.userData = {x, z};
-        chunk.generate();
+
+        if(this.asyncLoading){
+            requestIdleCallback(chunk.generate.bind(chunk, {timeout: 1000}));
+        } else {
+            chunk.generate();
+        }
         this.add(chunk);
-        console.log(`add chunk at X: ${x}, Z: ${z}`);
     }
 
     /**
@@ -174,20 +179,26 @@ export class World extends THREE.Group {
      * @param {number} chunkZ
      * @returns {WorldChunk | null}
      */
-        // ...existing code...
-        getChunk(chunkX, chunkZ){
-            return this.children.find(chunk =>
-                chunk.userData &&
-                chunk.userData.x === chunkX &&
-                chunk.userData.z === chunkZ
-            ) || null;
-        }
-    // ...existing code...
+    getChunk(chunkX, chunkZ){
+        return this.children.find(chunk =>
+            chunk.userData &&
+            chunk.userData.x === chunkX &&
+            chunk.userData.z === chunkZ
+        ) || null;
+    }
+
+    /**
+     * Gets the block data at x, y,z 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} z 
+     * @returns {{ id: number, instanceId: number } | null}
+     */
     getBlock(x, y, z){
         const coords = this.worldToChunkCoords(x, y, z);
         const chunk = this.getChunk(coords.chunk.x, coords.chunk.z);
 
-        if(chunk){
+        if(chunk && chunk.loaded){
             return chunk.getBlock(
                 coords.block.x,
                 coords.block.y,
