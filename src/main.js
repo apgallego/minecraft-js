@@ -79,6 +79,7 @@ const animate = () => {
 
     requestAnimationFrame(animate);    
     physics.update(deltaTime, player, world);
+    world.update(player);
     renderer.render(scene, player.controls.isLocked ? player.camera : orbitCamera);
     stats.update();
 

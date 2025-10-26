@@ -2,7 +2,15 @@ import * as THREE from 'three';
 import { WorldChunk } from './worldChunk';
 
 export class World extends THREE.Group {
+
+    //the number of chunks to render around the player
+    //if 0, only renders the chunk where the player is
+    //if n > 0, adjacent chunks are rendered
+    drawDistance = 1;
     
+    //to separate chunks in case of debugging visually
+    chunkSpacing = 1;
+
     chunkSize = {
         width: 64,
         height: 32
@@ -24,15 +32,112 @@ export class World extends THREE.Group {
 
     generate(){
         this.disposeChunks();
-        for(let x = -1; x <= 1; x++ ){
-            for(let z = -1; z <= 1; z++ ){
+        for(let x = -this.drawDistance; x <= this.drawDistance; x++ ){
+            for(let z = -this.drawDistance; z <= this.drawDistance; z++ ){
                 const chunk = new WorldChunk(this.chunkSize, this.params);
-                chunk.position.set(x * this.chunkSize.width, 0, z * this.chunkSize.width);
+                chunk.position.set(
+                    x * (this.chunkSize.width + this.chunkSpacing),
+                    0,
+                    z * (this.chunkSize.width + this.chunkSpacing)
+                );
                 chunk.userData = {x, z};
                 chunk.generate();
                 this.add(chunk);
             }
         }
+    }
+
+    /**
+     * Updates the visible portions of the world based on the current player position
+     * @param {Player} player
+     */
+    update(player){
+        const visibleChunks = this.getVisibleChunks(player);
+        const chunksToAdd = this.getChunksToAdd(visibleChunks);
+        this.removeUnusedChunks(visibleChunks);
+
+        for(const chunk of chunksToAdd){
+            this.generateChunk(chunk.x,chunk.z);
+        }
+    }
+
+    /**
+     * Returns an array contaiing the coordinates of the chunks that are currently visible to the player
+     * @param {Player} player
+     * @returns {{ x: number, z: number}[]}
+     */
+    getVisibleChunks(player){
+        const visibleChunks = [];
+
+        const coords = this.worldToChunkCoords(
+            player.position.x,
+            player.position.y,
+            player.position.z,
+        );
+
+        const chunkX = coords.chunk.x;
+        const chunkZ = coords.chunk.z;
+
+        for(let x = chunkX - this.drawDistance; x <= chunkX + this.drawDistance; x++){
+            for(let z = chunkZ - this.drawDistance; z <= chunkZ + this.drawDistance; z++){
+                visibleChunks.push({x, z });
+            }
+        }
+
+        return visibleChunks;
+    }
+
+    /**
+     * Returns an array containing the coordinates of the chunks that are not yet loaded and need to be adedd
+     * @param {{x: number, z: number}}
+     * @return {{x: number, z: number}}
+     */
+    getChunksToAdd(visibleChunks){
+        return visibleChunks.filter(chunk => {
+            const chunkExists = this.children
+                .map(obj => obj.userData)
+                .find(({x, z}) => chunk.x === x && chunk.z === z);
+
+            return !chunkExists;
+        });
+    }
+
+    /**
+     * Removes current loaded chunks that are no longer visible for the player
+     * @param {{ x: number, z: number }}
+     */
+    removeUnusedChunks(visibleChunks){
+        const chunksToRemove = this.children.filter(chunk => {
+            const { x, z} = chunk.userData;
+            const chunkExists = visibleChunks
+                .find((visibleChunk) => visibleChunk.x === x && visibleChunk.z === z);
+
+            return !chunkExists;
+        });
+
+        // Eliminar los chunks no usados
+        chunksToRemove.forEach(chunk => {
+            this.remove(chunk);
+            console.log(`removed chunk at X: ${chunk.userData.x}, Z: ${chunk.userData.z}`);
+        });
+    }
+
+    /**
+     * Generates the chunk at teh x, z coordinates
+     * @param {number} x
+     * @param {number} y
+     */
+    generateChunk(x, z){
+        const chunk = new WorldChunk(this.chunkSize, this.params);
+        chunk.position.set(
+            x * (this.chunkSize.width + this.chunkSpacing),
+            0,
+            z * (this.chunkSize.width + this.chunkSpacing)
+        );
+        chunk.userData = {x, z};
+        chunk.generate();
+        this.add(chunk);
+        console.log(`add chunk at X: ${x}, Z: ${z}`);
     }
 
     /**
