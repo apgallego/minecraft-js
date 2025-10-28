@@ -1,7 +1,7 @@
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { resources } from './blocks.js';
 
-export function createUI(scene, world, player){
+export function createUI(scene, world, player, physics){
     const gui = new GUI();
 
     const sceneFolder = gui.addFolder("Scene");
@@ -10,7 +10,12 @@ export function createUI(scene, world, player){
 
     const playerFolder = gui.addFolder("Player");
     playerFolder.add(player, 'maxSpeed', 1, 20).name("Max Speed");
+    player.cameraHelper.visible = false;
+    player.boundsHelper.visible = false;
+    physics.helpers.visible = false;
     playerFolder.add(player.cameraHelper, 'visible').name("Show Camera Helper");
+    playerFolder.add(player.boundsHelper, 'visible').name("Show Bounds Helper");
+    playerFolder.add(physics.helpers, 'visible').name("Show Collision Helper");
 
     const terrainFolder = gui.addFolder("Terrain");
     terrainFolder.add(world, 'asyncLoading').name("Async Chunk Loading");
