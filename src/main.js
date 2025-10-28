@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { World } from './js/world.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { createUI } from './js/ui.js';
-import { shadow } from 'three/tsl';
+import { cross, shadow } from 'three/tsl';
 import { Player } from './js/player.js';
 import { Physics } from './js/physics.js';
 const stats = new Stats();
@@ -26,6 +26,8 @@ document.body.appendChild(renderer.domElement);
 const orbitCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
 orbitCamera.position.set(-20, -20, -20);
 orbitCamera.lookAt(0, 0, 0);
+//this is an HTML element, not an element of the actual camera
+const crosshair = document.getElementById("crosshair");
 
 //camera controls setup
 const controls = new OrbitControls(orbitCamera, renderer.domElement);
@@ -81,13 +83,15 @@ const animate = () => {
 
     requestAnimationFrame(animate);
     if(player.controls.isLocked){
+        player.update(world);
         physics.update(deltaTime, player, world);
         world.update(player);
 
         sun.position.copy(player.position);
         sun.position.sub(new THREE.Vector3(-50, -50, -50));
         sun.target.position.copy(player.position);
-    }    
+    }
+    toggleCrosshair(player.controls.isLocked);
 
     renderer.render(scene, player.controls.isLocked ? player.camera : orbitCamera);
     stats.update();
@@ -104,6 +108,12 @@ window.addEventListener('resize', () => {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+const toggleCrosshair = (controlsLocked) => {
+    if(controlsLocked) crosshair.style.display = "inline";
+    else crosshair.style.display = "none";
+}
+
 
 
 // -- init --

@@ -7,6 +7,44 @@
     <title>Minecraft JS</title>
   </head>
   <body>
+    <style>
+    #crosshair {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1000;
+      display: none;
+    }
+
+    #crosshair::before,
+    #crosshair::after {
+      content: '';
+      position: absolute;
+      background-color: white;
+    }
+
+    /* vertical line */
+    #crosshair::before {
+      width: 2px;
+      height: 20px;
+      left: 9px;
+      top: 0;
+    }
+
+    /* horizontal line */
+    #crosshair::after {
+      width: 20px;
+      height: 2px;
+      left: 0;
+      top: 9px;
+    }
+</style>
+<div id="crosshair"></div>
+
     <div id="app"></div>
     <div id="info">
         <div id="player-position"></div>
