@@ -108,5 +108,5 @@ window.addEventListener('resize', () => {
 
 // -- init --
 setupLights();
-createUI(scene, world, player);
+createUI(scene, world, player, physics);
 animate();

@@ -33,7 +33,7 @@ export class Player{
         //wireframe mesh visualizing the player's bounding cylinder (hitbox???)
         this.boundsHelper = new THREE.Mesh(
             new THREE.CylinderGeometry(this.radius, this.radius, this.height, 16),
-            new THREE.MeshBasicMaterial({wireframe: true})
+            new THREE.MeshBasicMaterial() //{ wireframe: true }
         );
         scene.add(this.boundsHelper);
     }
