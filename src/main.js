@@ -73,6 +73,17 @@ const setupLights = () => {
     scene.add(ambient);
 };
 
+document.addEventListener('mousedown', ($event) => {
+    if(player.controls.isLocked && player.selectedCoords){
+        
+        world.removeBlock(
+            player.selectedCoords.x,
+            player.selectedCoords.y,
+            player.selectedCoords.z
+        );
+    }
+});
+
 /**
  * Render loop
  */
@@ -86,7 +97,6 @@ const animate = () => {
         player.update(world);
         physics.update(deltaTime, player, world);
         world.update(player);
-
         sun.position.copy(player.position);
         sun.position.sub(new THREE.Vector3(-50, -50, -50));
         sun.target.position.copy(player.position);

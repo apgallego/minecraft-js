@@ -50,6 +50,10 @@ export class Player{
         const selectionGeometry = new THREE.BoxGeometry(1.01, 1.01, 1.01);
         this.selectionHelper = new THREE.Mesh(selectionGeometry, selectionMaterial);
         scene.add(this.selectionHelper);
+        // const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+        // const edges = new THREE.EdgesGeometry(selectionGeometry);
+        // this.selectionHelper = new THREE.LineSegments(edges, lineMaterial);
+        // scene.add(this.selectionHelper);
     }
 
     get worldVelocity(){
@@ -57,7 +61,6 @@ export class Player{
         this.#worldVelocity.applyEuler(new THREE.Euler(0, this.camera.rotation.y, 0));
         return this.#worldVelocity;
     }
-
     
     update(world){
         this.updateRayCaster(world);
@@ -87,7 +90,6 @@ export class Player{
 
             this.selectionHelper.position.copy(this.selectedCoords);
             this.selectionHelper.visible = true;
-            console.log(this.selectedCoords);
         } else {
             this.selectedCoords = null;
             this.selectionHelper.visible = false;

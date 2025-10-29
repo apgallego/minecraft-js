@@ -215,4 +215,50 @@ export class World extends THREE.Group {
         });
         this.clear();
     }
+
+    /**
+     * Removes the block at x, y, z and sets it to empty
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
+
+    removeBlock(x, y ,z){
+        const coords = this.worldToChunkCoords(x, y , z);
+        const chunk = this.getChunk(coords.chunk.x, coords.chunk.z);
+
+        if(chunk){
+            chunk.removeBlock(
+                coords.block.x,
+                coords.block.y,
+                coords.block.z
+            );
+            //reveal adjacent blocks if hidden
+            this.revealBlock(x - 1, y, z);
+            this.revealBlock(x + 1, y, z);
+            this.revealBlock(x, y - 1, z);
+            this.revealBlock(x, y + 1, z);
+            this.revealBlock(x, y, z - 1);
+            this.revealBlock(x, y, z + 1);
+        }
+    }
+
+    /**
+     * Reveals the block at x, y, z by adding a new mesh instance
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
+    revealBlock(x, y, z){
+        const coords = this.worldToChunkCoords(x, y, z);
+        const chunk = this.getChunk(coords.chunk.x, coords.chunk.z);
+
+        if(chunk){
+            chunk.addBlockInstance(
+                coords.block.x,
+                coords.block.y,
+                coords.block.z
+            );
+        }
+    }
 }
