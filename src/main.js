@@ -75,12 +75,21 @@ const setupLights = () => {
 
 document.addEventListener('mousedown', ($event) => {
     if(player.controls.isLocked && player.selectedCoords){
-        
-        world.removeBlock(
-            player.selectedCoords.x,
-            player.selectedCoords.y,
-            player.selectedCoords.z
-        );
+        switch($event.button){
+            case 0: //left click 
+                world.removeBlock(
+                    player.selectedCoords.x,
+                    player.selectedCoords.y,
+                    player.selectedCoords.z
+                );
+                break;
+            case 1: //wheel
+                console.log("TODO: Get block");
+                break;
+            case 2: //right click
+                console.log("TODO: Place block");
+                break;
+        }
     }
 });
 
