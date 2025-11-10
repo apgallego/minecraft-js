@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { blocks } from './blocks';
 
 
 const CENTER_SCREEN = new THREE.Vector2();
@@ -21,6 +22,8 @@ export class Player{
     
     raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(), 0, 4);
     selectedCoords = null;
+    
+    activeBlockId = blocks.grass.id;
 
     /**
      * @param {THREE.Scene} scene 
@@ -88,6 +91,11 @@ export class Player{
             this.selectedCoords = chunk.position.clone();
             this.selectedCoords.applyMatrix4(blockMatrix);
 
+            //if we are adding a block, move the selection to adj nearest empty block
+            if(this.activeBlockId > blocks.empty.id){
+                this.selectedCoords.add(intersection.normal);
+            }
+
             this.selectionHelper.position.copy(this.selectedCoords);
             this.selectionHelper.visible = true;
         } else {
@@ -143,6 +151,19 @@ export class Player{
         }
 
         switch($event.code){
+            case 'Digit0':
+            case 'Digit1':
+            case 'Digit2':
+            case 'Digit3':
+            case 'Digit4':
+            case 'Digit5':
+            // case 'Digit6':
+            // case 'Digit7':
+            // case 'Digit8':
+            // case 'Digit9':
+                this.activeBlockId = Number($event.key);
+                console.log("activeBlockId -> ", $event.key);
+                break;
             case 'KeyW':
                 this.input.z = this.maxSpeed;
                 break;

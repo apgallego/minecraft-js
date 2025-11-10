@@ -73,7 +73,7 @@ const setupLights = () => {
     scene.add(ambient);
 };
 
-document.addEventListener('mousedown', ($event) => {
+const onMouseDown = ($event) => {
     if(player.controls.isLocked && player.selectedCoords){
         switch($event.button){
             case 0: //left click 
@@ -87,11 +87,18 @@ document.addEventListener('mousedown', ($event) => {
                 console.log("TODO: Get block");
                 break;
             case 2: //right click
-                console.log("TODO: Place block");
+                world.addBlock(
+                    player.selectedCoords.x,
+                    player.selectedCoords.y,
+                    player.selectedCoords.z,
+                    player.activeBlockId
+                );
                 break;
         }
     }
-});
+}
+
+document.addEventListener('mousedown', onMouseDown);
 
 /**
  * Render loop

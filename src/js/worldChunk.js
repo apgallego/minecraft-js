@@ -207,9 +207,6 @@ export class WorldChunk extends THREE.Group {
         // delete visual instance first
         if(block.instanceId !== null) this.deleteBlockInstance(x, y, z);
 
-        // mark block as empty
-        this.setBlockId(x, y, z, blocks.empty.id);
-
         //update adj blocks
         const adj = [
             [x+1,y,z],
@@ -226,6 +223,9 @@ export class WorldChunk extends THREE.Group {
                 this.addBlockInstance(ax, ay, az);
             }
         }
+
+        // mark block as empty
+        this.setBlockId(x, y, z, blocks.empty.id);
     }
 
     /**
@@ -346,5 +346,19 @@ export class WorldChunk extends THREE.Group {
             if(obj.dispose) obj.dispose();
         });
         this.clear();
+    }
+
+    /**
+     * Adds a new block at x, y, z
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @param {number} blockId
+     */
+    addBlock(x, y, z, blockId){
+        if(this.getBlock(x, y, z).id === blocks.empty.id) {
+            this.setBlockId(x, y, z, blockId);
+            this.addBlockInstance(x, y, z);
+        }
     }
 }
