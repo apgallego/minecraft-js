@@ -219,6 +219,9 @@ export class WorldChunk extends THREE.Group {
      * @param {number} z
      */
     removeBlock(x, y, z){
+        //the bottom layer of the terrain cannot be broken!
+        if(y === 0) return;
+        
         const block = this.getBlock(x, y, z);
         if(!block || block.id === blocks.empty.id) return;
 
