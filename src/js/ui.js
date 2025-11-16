@@ -47,6 +47,10 @@ export function createUI(scene, world, player, physics){
     treesFolder.add(world.params.trees.canopy, "maxRadius", 0, 10, 1).name("Max Canopy Size");
     treesFolder.add(world.params.trees.canopy, "density", 0, 1).name("Canopy Density");
 
+    const cloudsFolder = terrainFolder.addFolder("Clouds").close();
+    cloudsFolder.add(world.params.clouds, "scale", 0, 100).name("Cloud Size");
+    cloudsFolder.add(world.params.clouds, "density", 0, 1).name("Cloud Cover");
+    
     gui.onChange(() => {
         world.generate();
     });
