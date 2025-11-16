@@ -51,6 +51,8 @@ const physics = new Physics(scene);
 const sun = new THREE.DirectionalLight();
 const setupLights = () => {
     sun.position.set(50, 50, 50);
+    // reducir intensidad del sol para sombras menos oscuras
+    sun.intensity = 0.9; // prueba valores 0.6 - 1.2 según gusto
     sun.castShadow = true;
     sun.shadow.camera.left = -100;
     sun.shadow.camera.right = 100;
@@ -58,18 +60,19 @@ const setupLights = () => {
     sun.shadow.camera.top = 100;
     sun.shadow.camera.near = 0.1;
     sun.shadow.camera.far = 200;
-    sun.shadow.bias = -0.0001;
+    // ajustar bias para evitar artefactos; valores muy bajos/negativos pueden aclarar
+    sun.shadow.bias = -0.0005;
     sun.shadow.mapSize = new THREE.Vector2(2048, 2048);
 
     scene.add(sun);
     scene.add(sun.target);
 
-    // shows the light source (for debugging)
-    // const shadowHelper = new THREE.CameraHelper(sun.shadow.camera);
-    // scene.add(shadowHelper);
+    // añadir una luz hemisférica suave para "rellenar" las sombras
+    const hemi = new THREE.HemisphereLight(0x80a0ef, 0x444444, 0.35);
+    scene.add(hemi);
 
-    const ambient = new THREE.AmbientLight();
-    ambient.intensity = 0.1;
+    // aumentar la luz ambiental (suaviza aún más sombras)
+    const ambient = new THREE.AmbientLight(0xffffff, 0.45); // probar 0.2 - 0.6
     scene.add(ambient);
 };
 

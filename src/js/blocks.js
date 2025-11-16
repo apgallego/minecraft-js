@@ -88,6 +88,19 @@ export const blocks = {
         name: "leaves",
         material: new THREE.MeshLambertMaterial({ map: textures.leaves }),
     },
+    //TRANSPARENT LEAVES (TEST)
+    // leaves: {
+    //     id: 7,
+    //     name: "leaves",
+    //     material: new THREE.MeshLambertMaterial({
+    //         map: textures,
+    //         transparent: true,
+    //         // alphaTest baja hace que los bordes finos no recorten demasiado;
+    //         // prueba 0.05-0.2 según tu PNG
+    //         alphaTest: 0.1,
+    //         side: THREE.DoubleSide
+    //     }),
+    // },
     sand: {
         id: 8,
         name: "sand",

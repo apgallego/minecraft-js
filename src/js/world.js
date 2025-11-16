@@ -23,7 +23,7 @@ export class World extends THREE.Group {
         seed: 0,
         terrain: {
             scale: 30,
-            magnitude: 0.15,
+            magnitude: 0.10,
             offset: 0.2
         },
         trees: {
@@ -40,7 +40,7 @@ export class World extends THREE.Group {
         },
         clouds: {
             scale: 30,
-            density: 0.5
+            density: 0.25
         }
     };
 
