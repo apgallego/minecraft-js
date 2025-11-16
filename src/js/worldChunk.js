@@ -217,12 +217,16 @@ export class WorldChunk extends THREE.Group {
     /**
      * Generates the 3D world from the world data generated before
      */
+        /**
+     * Generates the 3D world from the world data generated before
+     * Distributes the mesh generation across multiple frames to avoid stuttering
+     */
     generateMeshes(){
         this.clear();
 
         const maxCount = this.size.width * this.size.width * this.size.height;
         
-        //createa a lookup table where the key is the block id and the value is the instanced mesh
+        // create a lookup table where the key is the block id and the value is the instanced mesh
         const meshes = {};
         Object.values(blocks)
         .filter(blockType => blockType.id !== blocks.empty.id)
@@ -235,15 +239,25 @@ export class WorldChunk extends THREE.Group {
             meshes[blockType.id] = mesh; 
         });
 
-        
         const matrix = new THREE.Matrix4();
-        for(let x = 0; x < this.size.width; x++){
-            for(let y = 0; y < this.size.height; y++){
-                for(let z = 0; z < this.size.width; z++){
-                    const blockId = this.getBlock(x, y, z).id;
-                    
-                    if(blockId === blocks.empty.id) continue;
+        const totalBlocks = this.size.width * this.size.width * this.size.height;
+        let blockIndex = 0;
+        
+        // procesamiento por lotes: max 5000 bloques por frame
+        const processBlocks = () => {
+            const blocksPerFrame = 5000;
+            const startIndex = blockIndex;
 
+            while(blockIndex < totalBlocks && blockIndex - startIndex < blocksPerFrame){
+                // convertir índice lineal a coordenadas x, y, z
+                const x = Math.floor(blockIndex / (this.size.height * this.size.width));
+                const remainder = blockIndex % (this.size.height * this.size.width);
+                const y = Math.floor(remainder / this.size.width);
+                const z = remainder % this.size.width;
+
+                const blockId = this.getBlock(x, y, z).id;
+                
+                if(blockId !== blocks.empty.id){
                     const mesh = meshes[blockId];
                     const blockInstanceId = mesh.count;
 
@@ -254,10 +268,22 @@ export class WorldChunk extends THREE.Group {
                         mesh.count++;
                     }
                 }
+                
+                blockIndex++;
             }
-        }
-        this.add(...Object.values(meshes));
+
+            // si aún quedan bloques, procesar en el siguiente frame
+            if(blockIndex < totalBlocks){
+                requestAnimationFrame(processBlocks);
+            } else {
+                // cuando termine, añadir todos los meshes
+                this.add(...Object.values(meshes));
+            }
+        };
+
+        requestAnimationFrame(processBlocks);
     }
+// ...existing code...
 
     /**
      * Gets the block data at x, y, z
