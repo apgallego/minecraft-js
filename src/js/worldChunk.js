@@ -32,6 +32,7 @@ export class WorldChunk extends THREE.Group {
         this.initializeTerrain();
         this.generateResources(rng);
         this.generateTerrain(rng);
+        this.generateTrees(rng);
         this.loadPlayerChanges();
         this.generateMeshes(rng);
 
@@ -109,6 +110,63 @@ export class WorldChunk extends THREE.Group {
                         }
                     }
 
+                }
+            }
+        }
+    }
+
+    /**
+     * Populate the world with trees
+     * @param {RNG} rng
+     */
+    generateTrees(rng){
+        const generateTreeTrunk = (x, z, rng) => {
+            const minH = this.params.trees.trunk.minHeight;
+            const maxH = this.params.trees.trunk.maxHeight;
+            const h = Math.round(minH + (maxH - minH) * rng.random());
+
+            //Search for the grass block which indicates the top of the terrain
+            for(let y = 0; y < this.size.height; y++){
+                const block = this.getBlock(x, y, z);
+                //grass block found
+                if(block && block.id === blocks.grass.id){
+                    //The trunk of the tree starts here
+                    for(let treeY = y + 1; treeY <= y + h; treeY++){
+                        this.setBlockId(x, treeY, z, blocks.tree.id);
+                    }
+
+                    //generate canopy centered on top of the tree
+                    generateTreeCanopy(x, y + h, z, rng);
+                    break;
+                }
+            }
+        };
+
+        const generateTreeCanopy = (centerX, centerY, centerZ, rng) => {
+            const minR = this.params.trees.canopy.minRadius;
+            const maxR = this.params.trees.canopy.maxRadius;
+            const r = Math.round(minR + (maxR - minR) * rng.random());
+
+            for(let x = -r; x <= r; x++){
+                for(let y = -r; y <= r; y++){
+                    for(let z = -r; z <= r; z++){
+                        if(x * x + y * y + z * z > r * r) continue;
+    
+                        const block = this.getBlock(centerX + x, centerY + y, centerZ + z);
+                        if(block && block.id !== blocks.empty.id) continue;
+                        if(rng.random() < this.params.trees.canopy.density){
+                            this.setBlockId(centerX + x, centerY + y, centerZ + z, blocks.leaves.id);
+                        }
+                    }
+                }
+            }
+        }
+
+        let offset = this.params.trees.canopy.maxRadius;
+        for(let x = offset; x < this.size.width - offset; x++){
+            for(let z = offset; z < this.size.width - offset; z++){
+                if(rng.random() < this.params.trees.frequency){
+                    generateTreeTrunk(x, z, rng);
                 }
             }
         }

@@ -84,17 +84,17 @@ export const blocks = {
         ]
     },
     leaves: {
-        id: 6,
+        id: 7,
         name: "leaves",
         material: new THREE.MeshLambertMaterial({ map: textures.leaves }),
     },
     sand: {
-        id: 7,
+        id: 8,
         name: "sand",
         material: new THREE.MeshLambertMaterial({ map: textures.sand })
     },
     cloud: {
-        id: 8,
+        id: 9,
         name: "cloud",
         material: new THREE.MeshBasicMaterial({ color: 0xf0f0f0})
     }
