@@ -9,11 +9,25 @@ export class Player{
     height = 1.75;
     jumpSpeed = 10;
     onGround = false;
-    maxSpeed = 10;
+    maxSpeed = 7;
     input = new THREE.Vector3();
     velocity = new THREE.Vector3();
     // '#' is for private vars
     #worldVelocity = new THREE.Vector3();
+
+    waterLevel = -Infinity; // detectable water level
+    underwaterOverlay = null; // blue overlay that sticks to the camera
+
+    // underwater behavior tuning
+    underwaterSpeedMultiplier = 0.5; //relative speed underwater (0..1)
+    // keep full initial impulse but apply a small sustained upward force so the ascent is slower (same reach, slower)
+    underwaterJumpInitialMultiplier = 1.0; //use full initial jump impulse underwater
+    underwaterJumpHoldMax = 1.2; //seconds the sustained thrust can be applied underwater
+    underwaterJumpHoldForce = 1.2; //small continuous upward force while holding jump underwater -> hace que la subida sea más lenta
+    jumpHoldRemaining = 0; //remaining counter for sustained thrust
+    spaceDown = false;  
+    jumpHoldRemaining = 0; //remaining counter for sustained thrust
+    spaceDown = false;   
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
     controls = new PointerLockControls(this.camera, document.body);
@@ -46,16 +60,35 @@ export class Player{
         );
         scene.add(this.boundsHelper);
 
-        const selectionMaterial = new THREE.MeshBasicMaterial({
+         const selectionMaterial = new THREE.MeshBasicMaterial({
             transparent: true,
             opacity: 0.3,
-            color: 0xffffaa
+            color: 0xffffaa,
+            side: THREE.DoubleSide, // mostrar desde ambas caras
+            depthWrite: false       // evita z-fighting con bloques opacos
         });
         const selectionGeometry = new THREE.BoxGeometry(1.01, 1.01, 1.01);
         this.selectionHelper = new THREE.Mesh(selectionGeometry, selectionMaterial);
         scene.add(this.selectionHelper);
 
+        // overlay que aplica el filtro azulado cuando la cámara está bajo el agua
+        const overlayMaterial = new THREE.MeshBasicMaterial({
+            color: 0x306080,
+            transparent: true,
+            opacity: 0.20,
+            depthTest: false,
+            depthWrite: false,
+            side: THREE.DoubleSide
+        });
+        const overlayGeo = new THREE.PlaneGeometry(2, 2);
+        this.underwaterOverlay = new THREE.Mesh(overlayGeo, overlayMaterial);
+        this.underwaterOverlay.position.set(0, 0, -0.1); // justo delante de la cámara
+        this.underwaterOverlay.renderOrder = 999;
+        this.underwaterOverlay.visible = false;
+        this.camera.add(this.underwaterOverlay);
+
         this.raycaster.layers.set(0);
+
     }
 
     get worldVelocity(){
@@ -65,7 +98,23 @@ export class Player{
     }
     
     update(world){
+        const baseY = world.position?.y ?? 0;
+        this.waterLevel = baseY + world.params.terrain.waterOffset + 0.4;
+
+        // show the overlay if the camera is under the water level
+        if(this.underwaterOverlay) {
+            this.underwaterOverlay.visible = this.position.y < this.waterLevel;
+        }
+
         this.updateRayCaster(world);
+    }
+
+    /**
+     * opcional: permite fijar manualmente el nivel de agua desde fuera
+     * @param {number} level
+     */
+    setWaterLevel(level){
+        this.waterLevel = level;
     }
 
     /**
@@ -114,10 +163,21 @@ export class Player{
 
     applyInputs(deltaTime){
         if(this.controls.isLocked){
-            this.velocity.x = this.input.x;
-            this.velocity.z = this.input.z;
+            // si estamos bajo el agua, mover más lento
+            const underwater = this.position.y < this.waterLevel;
+            const speedFactor = underwater ? this.underwaterSpeedMultiplier : 1;
+
+            this.velocity.x = this.input.x * speedFactor;
+            this.velocity.z = this.input.z * speedFactor;
             this.controls.moveRight(this.velocity.x * deltaTime);
             this.controls.moveForward(this.velocity.z * deltaTime);
+
+            // empuje sostenido al mantener espacio mientras estamos bajo el agua
+            if(this.spaceDown && !this.onGround && underwater && this.jumpHoldRemaining > 0){
+                this.velocity.y += this.underwaterJumpHoldForce * deltaTime;
+                this.jumpHoldRemaining = Math.max(0, this.jumpHoldRemaining - deltaTime);
+            }
+
             this.position.y += this.velocity.y * deltaTime;
         }
 
@@ -175,8 +235,17 @@ export class Player{
                 this.input.x = this.maxSpeed;
                 break;
             case 'Space':
-                if(this.onGround)
-                    this.velocity.y += this.jumpSpeed;
+                this.spaceDown = true;
+                if(this.onGround){
+                    // mantains initial impulse under water
+                    // slow jump
+                    this.velocity.y += this.jumpSpeed * this.underwaterJumpInitialMultiplier;
+                    if(this.position.y < this.waterLevel){
+                        this.jumpHoldRemaining = this.underwaterJumpHoldMax;
+                    } else {
+                        this.jumpHoldRemaining = 0;
+                    }
+                }
                 break;
         }
     }
@@ -198,6 +267,10 @@ export class Player{
                 break;
             case 'KeyD':
                 this.input.x = 0;
+                break;
+            case 'Space':
+                this.spaceDown = false;
+                this.jumpHoldRemaining = 0;
                 break;
             case 'KeyR':
                 this.position.set(32, 16, 32);
