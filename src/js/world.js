@@ -15,16 +15,17 @@ export class World extends THREE.Group {
     chunkSpacing = 0;
 
     chunkSize = {
-        width: 64,
-        height: 32
+        width: 32,
+        height: 48
     };
 
     params = {
         seed: 0,
         terrain: {
             scale: 30,
-            magnitude: 0.10,
-            offset: 0.2
+            magnitude: 10,
+            offset: 4,
+            waterOffset: 5
         },
         trees: {
             trunk: {

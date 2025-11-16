@@ -25,7 +25,7 @@ document.body.appendChild(renderer.domElement);
  */
 const orbitCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
 orbitCamera.position.set(-20, -20, -20);
-orbitCamera.lookAt(0, 0, 0);
+orbitCamera.layers.enable(1);
 //this is an HTML element, not an element of the actual camera
 const crosshair = document.getElementById("crosshair");
 
@@ -51,8 +51,8 @@ const physics = new Physics(scene);
 const sun = new THREE.DirectionalLight();
 const setupLights = () => {
     sun.position.set(50, 50, 50);
-    // reducir intensidad del sol para sombras menos oscuras
-    sun.intensity = 0.9; // prueba valores 0.6 - 1.2 según gusto
+    //reduce sun intensity for lighter shadows
+    sun.intensity = 1.1; // 0.6 - 1.2
     sun.castShadow = true;
     sun.shadow.camera.left = -100;
     sun.shadow.camera.right = 100;
@@ -60,19 +60,19 @@ const setupLights = () => {
     sun.shadow.camera.top = 100;
     sun.shadow.camera.near = 0.1;
     sun.shadow.camera.far = 200;
-    // ajustar bias para evitar artefactos; valores muy bajos/negativos pueden aclarar
+    //adjust bias
     sun.shadow.bias = -0.0005;
     sun.shadow.mapSize = new THREE.Vector2(2048, 2048);
 
     scene.add(sun);
     scene.add(sun.target);
 
-    // añadir una luz hemisférica suave para "rellenar" las sombras
+    // add hemispheric soft light to "complete" shadows
     const hemi = new THREE.HemisphereLight(0x80a0ef, 0x444444, 0.35);
     scene.add(hemi);
 
-    // aumentar la luz ambiental (suaviza aún más sombras)
-    const ambient = new THREE.AmbientLight(0xffffff, 0.45); // probar 0.2 - 0.6
+    //increase ambience light (for smoother shadows)
+    const ambient = new THREE.AmbientLight(0xffffff, 0.45); // 0.2 - 0.6
     scene.add(ambient);
 };
 

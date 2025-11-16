@@ -30,6 +30,7 @@ export class Player{
      */
     constructor(scene){
         this.position.set(32, 16, 32);
+        this.camera.layers.enable(1);
         scene.add(this.camera);
         
         //for debugging
@@ -53,10 +54,8 @@ export class Player{
         const selectionGeometry = new THREE.BoxGeometry(1.01, 1.01, 1.01);
         this.selectionHelper = new THREE.Mesh(selectionGeometry, selectionMaterial);
         scene.add(this.selectionHelper);
-        // const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-        // const edges = new THREE.EdgesGeometry(selectionGeometry);
-        // this.selectionHelper = new THREE.LineSegments(edges, lineMaterial);
-        // scene.add(this.selectionHelper);
+
+        this.raycaster.layers.set(0);
     }
 
     get worldVelocity(){
