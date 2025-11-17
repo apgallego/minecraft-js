@@ -9,13 +9,13 @@ export class World extends THREE.Group {
     //the number of chunks to render around the player
     //if 0, only renders the chunk where the player is
     //if n > 0, adjacent chunks are rendered
-    drawDistance = 1;
+    drawDistance = 6;
     
     //to separate chunks in case of debugging visually
     chunkSpacing = 0;
 
     chunkSize = {
-        width: 32,
+        width: 16,
         height: 32
     };
 
@@ -23,9 +23,9 @@ export class World extends THREE.Group {
         seed: 0,
         terrain: {
             scale: 30,
-            magnitude: 10,
-            offset: 4,
-            waterOffset: 5
+            magnitude: 6,
+            offset: 5,
+            waterOffset: 3
         },
         trees: {
             trunk: {
