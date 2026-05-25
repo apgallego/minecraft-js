@@ -6,6 +6,8 @@ import { createUI } from './js/ui.js';
 import { cross, shadow } from 'three/tsl';
 import { Player } from './js/player.js';
 import { Physics } from './js/physics.js';
+import { ModelLoader } from './js/modelLoader.js';
+
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
@@ -39,6 +41,7 @@ controls.update();
  */
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x80a0e0, 50, 160);
+
 const world = new World();
 world.generate();
 scene.add(world);
@@ -46,6 +49,11 @@ scene.add(world);
 const player = new Player(scene);
 
 const physics = new Physics(scene);
+
+const modelLoader = new ModelLoader();
+modelLoader.loadModels(models => {
+    player.tool.setMesh(models.pickaxe);
+});
 
 //add light
 const sun = new THREE.DirectionalLight();
@@ -85,6 +93,7 @@ const onMouseDown = ($event) => {
                     player.selectedCoords.y,
                     player.selectedCoords.z
                 );
+                player.tool.startAnimation();
                 break;
             case 1: //wheel
                 console.log("TODO: Get block");
