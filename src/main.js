@@ -94,6 +94,7 @@ const onMouseDown = ($event) => {
           player.selectedCoords.y,
           player.selectedCoords.z,
         );
+        player.tool.startAnimation();
         break;
       case 1: //wheel
         console.log("TODO: Get block");

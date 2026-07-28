@@ -123,6 +123,7 @@ export class Player {
     }
 
     this.updateRayCaster(world);
+    this.tool.update();
   }
 
   /**
