@@ -95,8 +95,8 @@ export const blocks = {
     //     material: new THREE.MeshLambertMaterial({
     //         map: textures,
     //         transparent: true,
-    //         // alphaTest baja hace que los bordes finos no recorten demasiado;
-    //         // prueba 0.05-0.2 según tu PNG
+    //         // A lower alphaTest prevents thin edges from being cut off too aggressively;
+    //         // try 0.05-0.2 depending on your PNG
     //         alphaTest: 0.1,
     //         side: THREE.DoubleSide
     //     }),

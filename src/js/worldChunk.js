@@ -272,7 +272,7 @@ export class WorldChunk extends THREE.Group {
             const startIndex = blockIndex;
 
             while(blockIndex < totalBlocks && blockIndex - startIndex < blocksPerFrame){
-                // convertir índice lineal a coordenadas x, y, z
+                // convert linear index to x, y, z coordinates
                 const x = Math.floor(blockIndex / (this.size.height * this.size.width));
                 const remainder = blockIndex % (this.size.height * this.size.width);
                 const y = Math.floor(remainder / this.size.width);
@@ -295,11 +295,11 @@ export class WorldChunk extends THREE.Group {
                 blockIndex++;
             }
 
-            // si aún quedan bloques, procesar en el siguiente frame
+            // if blocks remain, process them on the next frame
             if(blockIndex < totalBlocks){
                 requestAnimationFrame(processBlocks);
             } else {
-                // cuando termine, añadir todos los meshes
+                // when finished, add all the meshes
                 this.add(...Object.values(meshes));
             }
         };

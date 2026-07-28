@@ -23,7 +23,7 @@ export class Player{
     // keep full initial impulse but apply a small sustained upward force so the ascent is slower (same reach, slower)
     underwaterJumpInitialMultiplier = 1.0; //use full initial jump impulse underwater
     underwaterJumpHoldMax = 1.2; //seconds the sustained thrust can be applied underwater
-    underwaterJumpHoldForce = 1.2; //small continuous upward force while holding jump underwater -> hace que la subida sea más lenta
+    underwaterJumpHoldForce = 1.2; // small continuous upward force while holding jump underwater -> makes ascent slower
     jumpHoldRemaining = 0; //remaining counter for sustained thrust
     spaceDown = false;  
     jumpHoldRemaining = 0; //remaining counter for sustained thrust
@@ -71,7 +71,7 @@ export class Player{
         this.selectionHelper = new THREE.Mesh(selectionGeometry, selectionMaterial);
         scene.add(this.selectionHelper);
 
-        // overlay que aplica el filtro azulado cuando la cámara está bajo el agua
+        // overlay that applies the blue filter when the camera is underwater
         const overlayMaterial = new THREE.MeshBasicMaterial({
             color: 0x306080,
             transparent: true,
@@ -82,7 +82,7 @@ export class Player{
         });
         const overlayGeo = new THREE.PlaneGeometry(2, 2);
         this.underwaterOverlay = new THREE.Mesh(overlayGeo, overlayMaterial);
-        this.underwaterOverlay.position.set(0, 0, -0.1); // justo delante de la cámara
+        this.underwaterOverlay.position.set(0, 0, -0.1); // just in front of the camera
         this.underwaterOverlay.renderOrder = 999;
         this.underwaterOverlay.visible = false;
         this.camera.add(this.underwaterOverlay);
@@ -163,7 +163,7 @@ export class Player{
 
     applyInputs(deltaTime){
         if(this.controls.isLocked){
-            // si estamos bajo el agua, mover más lento
+            // if we are underwater, move more slowly
             const underwater = this.position.y < this.waterLevel;
             const speedFactor = underwater ? this.underwaterSpeedMultiplier : 1;
 
