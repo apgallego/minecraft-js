@@ -16,6 +16,7 @@ export class Player {
 
   waterLevel = -Infinity; // detectable water level
   underwaterOverlay = null; // blue overlay that sticks to the camera
+  baseFov = 70;
 
   // underwater behavior tuning
   underwaterSpeedMultiplier = 0.5; //relative speed underwater (0..1)
@@ -29,7 +30,7 @@ export class Player {
   spaceDown = false;
 
   camera = new THREE.PerspectiveCamera(
-    70,
+    this.baseFov,
     window.innerWidth / window.innerHeight,
     0.1,
     200,
@@ -219,6 +220,23 @@ export class Player {
   }
 
   /**
+   * Increase the camera FOV and player speed only while W and left Control are pressed.
+   */
+  run() {
+    this.input.z = this.maxSpeed * 1.5;
+    this.camera.fov = this.baseFov * 1.1;
+    this.camera.updateProjectionMatrix();
+  }
+
+  /**
+   * Resets FOV.
+   */
+  resetFov() {
+    this.camera.fov = this.baseFov;
+    this.camera.updateProjectionMatrix();
+  }
+
+  /**
    * Handler for "keydown"
    * @param {KeyboardEvent} event
    */
@@ -242,6 +260,9 @@ export class Player {
         break;
       case "KeyW":
         this.input.z = this.maxSpeed;
+        break;
+      case "KeyW" && "ControlLeft":
+        this.run();
         break;
       case "KeyA":
         this.input.x = -this.maxSpeed;
@@ -277,6 +298,7 @@ export class Player {
     switch ($event.code) {
       case "KeyW":
         this.input.z = 0;
+        this.resetFov();
         break;
       case "KeyA":
         this.input.x = 0;
