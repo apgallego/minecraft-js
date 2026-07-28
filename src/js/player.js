@@ -287,6 +287,10 @@ export class Player {
           }
         }
         break;
+      case "KeyC":
+        this.camera.fov = this.baseFov * -5;
+        this.camera.updateProjectionMatrix();
+        break;
     }
   }
 
@@ -316,6 +320,9 @@ export class Player {
       case "KeyR":
         this.position.set(32, 16, 32);
         this.velocity.set(0, 0, 0);
+        break;
+      case "KeyC":
+        this.resetFov();
         break;
     }
   }
