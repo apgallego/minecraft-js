@@ -6,6 +6,7 @@ import { createUI } from "./js/ui.js";
 import { cross, shadow } from "three/tsl";
 import { Player } from "./js/player.js";
 import { Physics } from "./js/physics.js";
+import { ModelLoader } from "./js/modelLoader.js";
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
@@ -49,6 +50,11 @@ scene.add(world);
 const player = new Player(scene);
 
 const physics = new Physics(scene);
+
+const modelLoader = new ModelLoader();
+modelLoader.loadModels((models) => {
+  player.tool.setMesh(models.pickaxe);
+});
 
 // Add light.
 const sun = new THREE.DirectionalLight();
