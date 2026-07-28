@@ -40,7 +40,7 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Initializing terrain data
+   * Initializes terrain data.
    */
   initializeTerrain() {
     this.data = [];
@@ -89,19 +89,19 @@ export class WorldChunk extends THREE.Group {
     for (let x = 0; x < this.size.width; x++) {
       for (let y = 0; y < this.size.height; y++) {
         for (let z = 0; z < this.size.width; z++) {
-          //get the noise value at x, z location
+          // Get the noise value at the x, z location.
           const value = simplex.noise(
             (this.position.x + x) / this.params.terrain.scale,
             (this.position.z + z) / this.params.terrain.scale,
           );
-          //get the noise based on the magnitued/offset
+          // Get the noise based on the magnitude/offset.
           const scaledNoise =
             this.params.terrain.offset + this.params.terrain.magnitude * value;
-          //get the height of the terrein at x, z
+          // Get the terrain height at x, z.
           let height = Math.floor(scaledNoise);
           height = Math.max(0, Math.min(height, this.size.height - 1));
 
-          //fill in all blocks at or below the terrain height
+          // Fill all blocks at or below the terrain height.
           for (let y = 0; y <= this.size.height; y++) {
             if (y <= this.params.terrain.waterOffset && y <= height) {
               this.setBlockId(x, y, z, blocks.sand.id);
@@ -130,7 +130,7 @@ export class WorldChunk extends THREE.Group {
       const maxH = this.params.trees.trunk.maxHeight;
       const h = Math.round(minH + (maxH - minH) * rng.random());
 
-      //Search for the grass block which indicates the top of the terrain
+      // Search for the grass block that marks the top of the terrain.
       for (let y = 0; y < this.size.height; y++) {
         const block = this.getBlock(x, y, z);
         //grass block found
@@ -156,7 +156,7 @@ export class WorldChunk extends THREE.Group {
         for (let y = -r; y <= r; y++) {
           for (let z = -r; z <= r; z++) {
             const n = rng.random();
-            //make sure the block is within the canopy radius
+            // Make sure the block is within the canopy radius.
             if (x * x + y * y + z * z > r * r) continue;
 
             // don't overwrite an existing block
@@ -268,7 +268,7 @@ export class WorldChunk extends THREE.Group {
     this.generateWater();
     const maxCount = this.size.width * this.size.width * this.size.height;
 
-    // create a lookup table where the key is the block id and the value is the instanced mesh
+    // Create a lookup table where the key is the block ID and the value is the instanced mesh.
     const meshes = {};
     Object.values(blocks)
       .filter((blockType) => blockType.id !== blocks.empty.id)
@@ -289,7 +289,7 @@ export class WorldChunk extends THREE.Group {
     const totalBlocks = this.size.width * this.size.width * this.size.height;
     let blockIndex = 0;
 
-    // procesamiento por lotes: max 5000 bloques por frame
+    // Process blocks in batches: max 5000 blocks per frame.
     const processBlocks = () => {
       const blocksPerFrame = 5000;
       const startIndex = blockIndex;
@@ -334,7 +334,7 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Gets the block data at x, y, z
+   * Gets the block data at x, y, z.
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -346,7 +346,7 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Sets the block id for the block at x, y, z
+   * Sets the block ID for the block at x, y, z.
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -357,7 +357,7 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Sets the block instanceId for the block at x, y, z
+   * Sets the block instance ID for the block at x, y, z.
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -368,13 +368,13 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Removes the block at x, y, z and sets it to empty
+   * Removes the block at x, y, z and sets it to empty.
    * @param {number} x
    * @param {number} y
    * @param {number} z
    */
   removeBlock(x, y, z) {
-    //the bottom layer of the terrain cannot be broken!
+    // The bottom layer of the terrain cannot be broken!
     if (y === 0) return;
 
     const block = this.getBlock(x, y, z);
@@ -383,8 +383,8 @@ export class WorldChunk extends THREE.Group {
     // delete visual instance first
     if (block.instanceId !== null) this.deleteBlockInstance(x, y, z);
 
-    //update adj blocks
-    const adj = [
+    // Update adjacent blocks.
+    const adjacentBlocks = [
       [x + 1, y, z],
       [x - 1, y, z],
       [x, y + 1, z],
@@ -393,7 +393,7 @@ export class WorldChunk extends THREE.Group {
       [x, y, z - 1],
     ];
 
-    for (const [ax, ay, az] of adj) {
+    for (const [ax, ay, az] of adjacentBlocks) {
       const a = this.getBlock(ax, ay, az);
       if (
         a &&
@@ -436,13 +436,13 @@ export class WorldChunk extends THREE.Group {
     const lastIndex = mesh.count - 1;
 
     if (removeId !== lastIndex) {
-      //brings the matric of the last element and moves it into the position of the removed element
+      // Bring the matrix of the last element into the position of the removed element.
       const lastMatrix = new THREE.Matrix4();
       mesh.getMatrixAt(lastIndex, lastMatrix);
 
       mesh.setMatrixAt(removeId, lastMatrix);
 
-      //obtains the position of the last element to update its block (instanceId)
+      // Obtain the position of the last element to update its block instance ID.
       const pos = new THREE.Vector3();
       lastMatrix.decompose(pos, new THREE.Quaternion(), new THREE.Vector3());
       const lx = Math.round(pos.x);
@@ -451,7 +451,7 @@ export class WorldChunk extends THREE.Group {
 
       const lastBlock = this.getBlock(lx, ly, lz);
       if (lastBlock) {
-        //updates the instanceId of the block that was moved
+        // Update the instance ID of the block that was moved.
         this.setBlockInstanceId(lx, ly, lz, removeId);
       }
     }
@@ -495,7 +495,7 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Checks if the given x, y, z coordinates are within the world bounds
+   * Checks whether the given x, y, z coordinates are within the world bounds.
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -546,7 +546,7 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Adds a new block at x, y, z
+   * Adds a new block at x, y, z.
    * @param {number} x
    * @param {number} y
    * @param {number} z

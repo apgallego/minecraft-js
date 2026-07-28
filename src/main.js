@@ -1,11 +1,11 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { World } from './js/world.js';
-import Stats from 'three/examples/jsm/libs/stats.module.js';
-import { createUI } from './js/ui.js';
-import { cross, shadow } from 'three/tsl';
-import { Player } from './js/player.js';
-import { Physics } from './js/physics.js';
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { World } from "./js/world.js";
+import Stats from "three/examples/jsm/libs/stats.module.js";
+import { createUI } from "./js/ui.js";
+import { cross, shadow } from "three/tsl";
+import { Player } from "./js/player.js";
+import { Physics } from "./js/physics.js";
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
@@ -23,13 +23,16 @@ document.body.appendChild(renderer.domElement);
 /**
  * Camera setup
  */
-const orbitCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
+const orbitCamera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+);
 orbitCamera.position.set(-20, -20, -20);
 orbitCamera.layers.enable(1);
-//this is an HTML element, not an element of the actual camera
+// This is an HTML element, not an element of the actual camera.
 const crosshair = document.getElementById("crosshair");
 
-//camera controls setup
+// Camera controls setup.
 const controls = new OrbitControls(orbitCamera, renderer.domElement);
 controls.target.set(16, 0, 16);
 controls.update();
@@ -47,103 +50,104 @@ const player = new Player(scene);
 
 const physics = new Physics(scene);
 
-//add light
+// Add light.
 const sun = new THREE.DirectionalLight();
 const setupLights = () => {
-    sun.position.set(50, 50, 50);
-    //reduce sun intensity for lighter shadows
-    sun.intensity = 1.1; // 0.6 - 1.2
-    sun.castShadow = true;
-    sun.shadow.camera.left = -100;
-    sun.shadow.camera.right = 100;
-    sun.shadow.camera.bottom = -100;
-    sun.shadow.camera.top = 100;
-    sun.shadow.camera.near = 0.1;
-    sun.shadow.camera.far = 200;
-    //adjust bias
-    sun.shadow.bias = -0.0005;
-    sun.shadow.mapSize = new THREE.Vector2(2048, 2048);
+  sun.position.set(50, 50, 50);
+  // Reduce sun intensity for lighter shadows.
+  sun.intensity = 1.1; // 0.6 - 1.2
+  sun.castShadow = true;
+  sun.shadow.camera.left = -100;
+  sun.shadow.camera.right = 100;
+  sun.shadow.camera.bottom = -100;
+  sun.shadow.camera.top = 100;
+  sun.shadow.camera.near = 0.1;
+  sun.shadow.camera.far = 200;
+  // Adjust the bias.
+  sun.shadow.bias = -0.0005;
+  sun.shadow.mapSize = new THREE.Vector2(2048, 2048);
 
-    scene.add(sun);
-    scene.add(sun.target);
+  scene.add(sun);
+  scene.add(sun.target);
 
-    // add hemispheric soft light to "complete" shadows
-    const hemi = new THREE.HemisphereLight(0x80a0ef, 0x444444, 0.35);
-    scene.add(hemi);
+  // Add hemispheric soft light to complete the shadows.
+  const hemi = new THREE.HemisphereLight(0x80a0ef, 0x444444, 0.35);
+  scene.add(hemi);
 
-    //increase ambience light (for smoother shadows)
-    const ambient = new THREE.AmbientLight(0xffffff, 0.45); // 0.2 - 0.6
-    scene.add(ambient);
+  // Increase ambient light for smoother shadows.
+  const ambient = new THREE.AmbientLight(0xffffff, 0.45); // 0.2 - 0.6
+  scene.add(ambient);
 };
 
 const onMouseDown = ($event) => {
-    if(player.controls.isLocked && player.selectedCoords){
-        switch($event.button){
-            case 0: //left click 
-                world.removeBlock(
-                    player.selectedCoords.x,
-                    player.selectedCoords.y,
-                    player.selectedCoords.z
-                );
-                break;
-            case 1: //wheel
-                console.log("TODO: Get block");
-                break;
-            case 2: //right click
-                world.addBlock(
-                    player.selectedCoords.x,
-                    player.selectedCoords.y,
-                    player.selectedCoords.z,
-                    player.activeBlockId
-                );
-                break;
-        }
+  if (player.controls.isLocked && player.selectedCoords) {
+    switch ($event.button) {
+      case 0: //left click
+        world.removeBlock(
+          player.selectedCoords.x,
+          player.selectedCoords.y,
+          player.selectedCoords.z,
+        );
+        break;
+      case 1: //wheel
+        console.log("TODO: Get block");
+        break;
+      case 2: //right click
+        world.addBlock(
+          player.selectedCoords.x,
+          player.selectedCoords.y,
+          player.selectedCoords.z,
+          player.activeBlockId,
+        );
+        break;
     }
-}
+  }
+};
 
-document.addEventListener('mousedown', onMouseDown);
+document.addEventListener("mousedown", onMouseDown);
 
 /**
  * Render loop
  */
 let previousTime = performance.now();
 const animate = () => {
-    let currentTime = performance.now();
-    let deltaTime = (currentTime - previousTime) / 1000;
+  let currentTime = performance.now();
+  let deltaTime = (currentTime - previousTime) / 1000;
 
-    requestAnimationFrame(animate);
-    if(player.controls.isLocked){
-        player.update(world);
-        physics.update(deltaTime, player, world);
-        world.update(player);
-        sun.position.copy(player.position);
-        sun.position.sub(new THREE.Vector3(-50, -50, -50));
-        sun.target.position.copy(player.position);
-    }
-    toggleCrosshair(player.controls.isLocked);
+  requestAnimationFrame(animate);
+  if (player.controls.isLocked) {
+    player.update(world);
+    physics.update(deltaTime, player, world);
+    world.update(player);
+    sun.position.copy(player.position);
+    sun.position.sub(new THREE.Vector3(-50, -50, -50));
+    sun.target.position.copy(player.position);
+  }
+  toggleCrosshair(player.controls.isLocked);
 
-    renderer.render(scene, player.controls.isLocked ? player.camera : orbitCamera);
-    stats.update();
+  renderer.render(
+    scene,
+    player.controls.isLocked ? player.camera : orbitCamera,
+  );
+  stats.update();
 
-    previousTime = currentTime;
+  previousTime = currentTime;
 };
 
-window.addEventListener('resize', () => {
-    orbitCamera.aspect = window.innerWidth / window.innerHeight;
-    orbitCamera.updateProjectionMatrix();
+window.addEventListener("resize", () => {
+  orbitCamera.aspect = window.innerWidth / window.innerHeight;
+  orbitCamera.updateProjectionMatrix();
 
-    player.camera.aspect = window.innerWidth / window.innerHeight;
-    player.camera.updateProjectionMatrix();
+  player.camera.aspect = window.innerWidth / window.innerHeight;
+  player.camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
 const toggleCrosshair = (controlsLocked) => {
-    if(controlsLocked) crosshair.style.display = "inline";
-    else crosshair.style.display = "none";
-}
-
-
+  if (controlsLocked) crosshair.style.display = "inline";
+  else crosshair.style.display = "none";
+};
 
 // -- init --
 setupLights();

@@ -56,13 +56,13 @@ export class Player {
     this.camera.layers.enable(1);
     scene.add(this.camera);
 
-    //for debugging
+    // for debugging
     scene.add(this.cameraHelper);
 
     document.addEventListener("keydown", this.onKeyDown.bind(this));
     document.addEventListener("keyup", this.onKeyUp.bind(this));
 
-    //wireframe mesh visualizing the player's bounding cylinder (hitbox???)
+    // wireframe mesh visualizing the player's bounding cylinder (hitbox?)
     this.boundsHelper = new THREE.Mesh(
       new THREE.CylinderGeometry(this.radius, this.radius, this.height, 16),
       new THREE.MeshBasicMaterial(), //{ wireframe: true }
@@ -73,8 +73,8 @@ export class Player {
       transparent: true,
       opacity: 0.3,
       color: 0xffffaa,
-      side: THREE.DoubleSide, // mostrar desde ambas caras
-      depthWrite: false, // evita z-fighting con bloques opacos
+      side: THREE.DoubleSide, // show from both sides
+      depthWrite: false, // avoid z-fighting with opaque blocks
     });
     const selectionGeometry = new THREE.BoxGeometry(1.01, 1.01, 1.01);
     this.selectionHelper = new THREE.Mesh(selectionGeometry, selectionMaterial);
@@ -111,7 +111,7 @@ export class Player {
     const baseY = world.position?.y ?? 0;
     this.waterLevel = baseY + world.params.terrain.waterOffset + 0.4;
 
-    // show the overlay if the camera is under the water level
+    // Show the overlay if the camera is under the water level.
     if (this.underwaterOverlay) {
       this.underwaterOverlay.visible = this.position.y < this.waterLevel;
     }
@@ -120,7 +120,7 @@ export class Player {
   }
 
   /**
-   * opcional: permite fijar manualmente el nivel de agua desde fuera
+   * Optional: allows manually setting the water level from outside.
    * @param {number} level
    */
   setWaterLevel(level) {
@@ -137,19 +137,19 @@ export class Player {
     if (intersections.length > 0) {
       const intersection = intersections[0];
 
-      //Get the position of the chunk where the block is contained in
+      // Get the position of the chunk that contains the block.
       const chunk = intersection.object.parent;
 
-      //Get transformation matrix of the intersected block
+      // Get the transformation matrix of the intersected block.
       const blockMatrix = new THREE.Matrix4();
       intersection.object.getMatrixAt(intersection.instanceId, blockMatrix);
 
-      //Extract the position of the block's transformation matrix
-      // and store it in selectedCoords
+      // Extract the position from the block transformation matrix
+      // and store it in selectedCoords.
       this.selectedCoords = chunk.position.clone();
       this.selectedCoords.applyMatrix4(blockMatrix);
 
-      //if we are adding a block, move the selection to adj nearest empty block
+      // If we are adding a block, move the selection to the nearest empty adjacent block.
       if (this.activeBlockId > blocks.empty.id) {
         this.selectedCoords.add(intersection.normal);
       }
@@ -182,7 +182,7 @@ export class Player {
       this.controls.moveRight(this.velocity.x * deltaTime);
       this.controls.moveForward(this.velocity.z * deltaTime);
 
-      // empuje sostenido al mantener espacio mientras estamos bajo el agua
+      // Sustained upward push while holding space underwater.
       if (
         this.spaceDown &&
         !this.onGround &&
@@ -255,8 +255,8 @@ export class Player {
       case "Space":
         this.spaceDown = true;
         if (this.onGround) {
-          // mantains initial impulse under water
-          // slow jump
+          // Maintain the initial impulse underwater.
+          // Slow jump.
           this.velocity.y +=
             this.jumpSpeed * this.underwaterJumpInitialMultiplier;
           if (this.position.y < this.waterLevel) {
