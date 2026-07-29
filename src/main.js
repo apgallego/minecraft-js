@@ -44,7 +44,7 @@ controls.update();
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x80a0e0, 50, 160);
 const world = new World();
-world.generate();
+world.generate(true);
 scene.add(world);
 
 const player = new Player(scene);

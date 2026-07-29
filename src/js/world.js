@@ -49,10 +49,50 @@ export class World extends THREE.Group {
   constructor(seed = 0) {
     super();
     this.seed = seed;
+
+    document.addEventListener("keydown", ($event) => {
+      switch ($event.code) {
+        case "KeyG":
+          this.save();
+          break;
+        case "KeyL":
+          this.load();
+          break;
+      }
+    });
   }
 
-  generate() {
-    this.dataStore.clear();
+  /**
+   * Saves the current world state to localStorage.
+   */
+  save() {
+    localStorage.setItem("minecraft_params", JSON.stringify(this.params));
+    localStorage.setItem("minecraft_data", JSON.stringify(this.dataStore.data));
+    document.getElementById("status").innerText = "World saved!";
+    setTimeout(() => {
+      document.getElementById("status").innerText = "";
+    }, 3000);
+  }
+
+  /**
+   * Loads the world state from localStorage.
+   */
+  load() {
+    console.log("load");
+    this.params = JSON.parse(localStorage.getItem("minecraft_params"));
+    this.dataStore.data = JSON.parse(localStorage.getItem("minecraft_data"));
+    document.getElementById("status").innerText = "World loaded!";
+    setTimeout(() => {
+      document.getElementById("status").innerText = "";
+    }, 3000);
+    this.generate();
+    console.log("load");
+  }
+
+  generate(clearCache = false) {
+    if (clearCache) {
+      this.dataStore.clear();
+    }
     this.disposeChunks();
     for (let x = -this.drawDistance; x <= this.drawDistance; x++) {
       for (let z = -this.drawDistance; z <= this.drawDistance; z++) {

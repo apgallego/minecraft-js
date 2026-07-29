@@ -1,12 +1,19 @@
+@font-face {
+  font-family: "Minecraft";
+  src: url("/fonts/Minecraft.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
+  font-family: "Minecraft", sans-serif;
 }
 
 #info {
   position: absolute;
   right: 0;
   bottom: 0;
-  font-family: sans-serif;
   color: white;
   margin: 8px;
 }
@@ -37,4 +44,13 @@ body {
 
 .toolbar-icon.selected {
   outline: 4px solid rgb(0, 255, 26);
+}
+
+#status {
+  position: fixed;
+  bottom: 8px;
+  left: 8px;
+  font-size: 2em;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
