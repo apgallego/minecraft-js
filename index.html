@@ -8,46 +8,104 @@
   </head>
   <body>
     <style>
-    #crosshair {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 20px;
-      height: 20px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 1000;
-      display: none;
-    }
+      #crosshair {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 1000;
+        display: none;
+      }
 
-    #crosshair::before,
-    #crosshair::after {
-      content: '';
-      position: absolute;
-      background-color: white;
-    }
+      #crosshair::before,
+      #crosshair::after {
+        content: "";
+        position: absolute;
+        background-color: white;
+      }
 
-    /* vertical line */
-    #crosshair::before {
-      width: 2px;
-      height: 20px;
-      left: 9px;
-      top: 0;
-    }
+      /* vertical line */
+      #crosshair::before {
+        width: 2px;
+        height: 20px;
+        left: 9px;
+        top: 0;
+      }
 
-    /* horizontal line */
-    #crosshair::after {
-      width: 20px;
-      height: 2px;
-      left: 0;
-      top: 9px;
-    }
-</style>
-<div id="crosshair"></div>
+      /* horizontal line */
+      #crosshair::after {
+        width: 20px;
+        height: 2px;
+        left: 0;
+        top: 9px;
+      }
+    </style>
+    <div id="crosshair"></div>
 
     <div id="app"></div>
+    <div id="toolbar-container">
+      <div id="toolbar">
+        <img
+          src="/textures/grass.png"
+          alt="Toolbar 1"
+          class="toolbar-icon"
+          id="toolbar-1"
+        />
+        <img
+          src="/textures/dirt.png"
+          alt="Toolbar 2"
+          class="toolbar-icon"
+          id="toolbar-2"
+        />
+        <img
+          src="/textures/stone.png"
+          alt="Toolbar 3"
+          class="toolbar-icon"
+          id="toolbar-3"
+        />
+        <img
+          src="/textures/coal_ore.png"
+          alt="Toolbar 4"
+          class="toolbar-icon"
+          id="toolbar-4"
+        />
+        <img
+          src="/textures/iron_ore.png"
+          alt="Toolbar 5"
+          class="toolbar-icon"
+          id="toolbar-5"
+        />
+        <img
+          src="/textures/tree_side.png"
+          alt="Toolbar 6"
+          class="toolbar-icon"
+          id="toolbar-6"
+        />
+        <img
+          src="/textures/leaves.png"
+          alt="Toolbar 7"
+          class="toolbar-icon"
+          id="toolbar-7"
+        />
+        <img
+          src="/textures/sand.png"
+          alt="Toolbar 8"
+          class="toolbar-icon"
+          id="toolbar-8"
+        />
+        <img
+          src="/textures/pickaxe.png"
+          alt="Toolbar 9"
+          class="toolbar-icon selected"
+          id="toolbar-0"
+        />
+      </div>
+    </div>
     <div id="info">
-        <div id="player-position"></div>
+      <div id="player-position"></div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>

@@ -48,7 +48,7 @@ export class Player {
   );
   selectedCoords = null;
 
-  activeBlockId = blocks.grass.id;
+  activeBlockId = blocks.empty.id;
 
   tool = new Tool();
 
@@ -261,8 +261,16 @@ export class Player {
       case "Digit6":
       case "Digit7":
       case "Digit8":
-      case "Digit9":
+        document
+          .getElementById(`toolbar-${this.activeBlockId}`)
+          .classList.remove("selected");
         this.activeBlockId = Number($event.key);
+        document
+          .getElementById(`toolbar-${this.activeBlockId}`)
+          .classList.add("selected");
+
+        // show the tool only when the active block is not empty
+        this.tool.visible = this.activeBlockId === blocks.empty.id;
         break;
       case "KeyW":
         this.input.z = this.maxSpeed;

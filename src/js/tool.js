@@ -26,6 +26,7 @@ export class Tool extends THREE.Group {
     //set a tiomut to stop the animation after a certain duration
     this.animation = setTimeout(() => {
       this.animate = false;
+      this.toolMesh.rotation.z = 0;
     }, this.animationDuration);
   }
 
