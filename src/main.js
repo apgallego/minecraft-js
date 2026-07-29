@@ -48,6 +48,7 @@ world.generate(true);
 scene.add(world);
 
 const player = new Player(scene);
+world.setPlayer(player);
 
 const physics = new Physics(scene);
 

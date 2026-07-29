@@ -45,6 +45,7 @@ export class World extends THREE.Group {
   };
 
   dataStore = new DataStore();
+  player = null;
 
   constructor(seed = 0) {
     super();
@@ -63,11 +64,29 @@ export class World extends THREE.Group {
   }
 
   /**
+   * Sets the player object for the world, allowing the world to access the player's position and other properties.
+   * @param {*} player
+   */
+  setPlayer(player) {
+    this.player = player;
+  }
+
+  /**
    * Saves the current world state to localStorage.
    */
   save() {
     localStorage.setItem("minecraft_params", JSON.stringify(this.params));
     localStorage.setItem("minecraft_data", JSON.stringify(this.dataStore.data));
+
+    const playerPosition = this.player
+      ? {
+          x: this.player.position.x,
+          y: this.player.position.y,
+          z: this.player.position.z,
+        }
+      : null;
+    localStorage.setItem("minecraft_player", JSON.stringify(playerPosition));
+
     document.getElementById("status").innerText = "World saved!";
     setTimeout(() => {
       document.getElementById("status").innerText = "";
@@ -78,15 +97,36 @@ export class World extends THREE.Group {
    * Loads the world state from localStorage.
    */
   load() {
-    console.log("load");
-    this.params = JSON.parse(localStorage.getItem("minecraft_params"));
-    this.dataStore.data = JSON.parse(localStorage.getItem("minecraft_data"));
+    const savedParams = localStorage.getItem("minecraft_params");
+    if (savedParams) {
+      this.params = JSON.parse(savedParams);
+    }
+
+    const savedData = localStorage.getItem("minecraft_data");
+    if (savedData) {
+      this.dataStore.data = JSON.parse(savedData);
+    }
+
+    const savedPlayer = localStorage.getItem("minecraft_player");
+    let playerPosition = null;
+    if (savedPlayer) {
+      playerPosition = JSON.parse(savedPlayer);
+    }
+
     document.getElementById("status").innerText = "World loaded!";
     setTimeout(() => {
       document.getElementById("status").innerText = "";
     }, 3000);
+
     this.generate();
-    console.log("load");
+
+    if (this.player && playerPosition) {
+      this.player.position.set(
+        playerPosition.x,
+        playerPosition.y,
+        playerPosition.z,
+      );
+    }
   }
 
   generate(clearCache = false) {
