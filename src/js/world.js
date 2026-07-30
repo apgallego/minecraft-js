@@ -21,10 +21,21 @@ export class World extends THREE.Group {
   params = {
     seed: 0,
     terrain: {
-      scale: 30,
-      magnitude: 6,
-      offset: 5,
+      scale: 80,
+      magnitude: 10,
+      offset: 6,
       waterOffset: 3,
+    },
+    biomes: {
+      scale: 200,
+      variation: {
+        amplitude: 0.2,
+        scale: 50,
+      },
+      tundraToTemperate: 0.1,
+      temperateToJungle: 0.5,
+      jungleToDesert: 0.9,
+      deserToTemperate: 1, //not needed
     },
     trees: {
       trunk: {
@@ -40,7 +51,7 @@ export class World extends THREE.Group {
     },
     clouds: {
       scale: 30,
-      density: 0.25,
+      density: 0,
     },
   };
 

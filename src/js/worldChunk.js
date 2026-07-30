@@ -61,6 +61,46 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
+   * Gets the biome type at the given x, z coordinates.
+   * @param {SimplexNoise} simplex
+   * @param {number} x
+   * @param {number} z
+   */
+  getBiome(simplex, x, z) {
+    // compute the noise value at the x, z location to determine the biome type
+    let noise =
+      0.5 *
+        simplex.noise(
+          (this.position.x + x) / this.params.biomes.scale,
+          (this.position.z + z) / this.params.biomes.scale,
+        ) +
+      0.5;
+
+    noise +=
+      this.params.biomes.variation.amplitude *
+      simplex.noise(
+        (this.position.x + x) / this.params.biomes.variation.scale,
+        (this.position.z + z) / this.params.biomes.variation.scale,
+      );
+
+    // noise varies between 0 and 1
+    //0 - 0.25 = tundra
+    //0.25 - 0.5 = temperate
+    //0.5 - 0.75 = jungle
+    //0.75 - 1 = desert
+    if (noise < this.params.biomes.tundraToTemperate) {
+      return "Tundra";
+    }
+    if (noise < this.params.biomes.temperateToJungle) {
+      return "Temperate";
+    }
+    if (noise < this.params.biomes.jungleToDesert) {
+      return "Jungle";
+    }
+    return "Desert";
+  }
+
+  /**
    * Generates resources like coal, stone, etc.
    */
   generateResources(rng) {
@@ -106,7 +146,23 @@ export class WorldChunk extends THREE.Group {
             if (y <= this.params.terrain.waterOffset && y <= height) {
               this.setBlockId(x, y, z, blocks.sand.id);
             } else if (y === height) {
-              this.setBlockId(x, y, z, blocks.grass.id);
+              const biome = this.getBiome(simplex, x, z);
+              let groundBlockType;
+              switch (biome) {
+                case "Desert":
+                  groundBlockType = blocks.sand.id;
+                  break;
+                case "Temperate":
+                  groundBlockType = blocks.grass.id;
+                  break;
+                case "Jungle":
+                  groundBlockType = blocks.jungleGrass.id;
+                  break;
+                case "Tundra":
+                  groundBlockType = blocks.snow.id;
+                  break;
+              }
+              this.setBlockId(x, y, z, groundBlockType);
             } else if (
               y < height &&
               this.getBlock(x, y, z).id === blocks.empty.id
@@ -169,7 +225,7 @@ export class WorldChunk extends THREE.Group {
                 centerX + x,
                 centerY + y,
                 centerZ + z,
-                blocks.leaves.id,
+                blocks.jungleLeaves.id,
               );
             }
           }

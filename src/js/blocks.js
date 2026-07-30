@@ -21,6 +21,13 @@ export const textures = {
   treeSide: loadTexture("textures/tree_side.png"),
   treeTop: loadTexture("textures/tree_top.png"),
   sand: loadTexture("textures/sand.png"),
+  snow: loadTexture("textures/snow.png"),
+  snowSide: loadTexture("textures/snow_side.png"),
+  jungleTreeSide: loadTexture("textures/jungle_tree_side.png"),
+  jungleTreeTop: loadTexture("textures/jungle_tree_top.png"),
+  jungleLeaves: loadTexture("textures/jungle_leaves.png"),
+  jungleGrass: loadTexture("textures/jungle_grass.png"),
+  jungleGrassSide: loadTexture("textures/jungle_grass_side.png"),
 };
 
 export const blocks = {
@@ -111,6 +118,49 @@ export const blocks = {
     id: 9,
     name: "cloud",
     material: new THREE.MeshBasicMaterial({ color: 0xf0f0f0 }),
+  },
+  snow: {
+    id: 10,
+    name: "snow",
+    material: [
+      new THREE.MeshLambertMaterial({ map: textures.snowSide }),
+      new THREE.MeshLambertMaterial({ map: textures.snowSide }),
+      new THREE.MeshLambertMaterial({ map: textures.snow }),
+      new THREE.MeshLambertMaterial({ map: textures.dirt }),
+      new THREE.MeshLambertMaterial({ map: textures.snowSide }),
+      new THREE.MeshLambertMaterial({ map: textures.snowSide }),
+    ],
+  },
+  jungleTree: {
+    id: 11,
+    name: "jungleTree",
+    material: [
+      new THREE.MeshLambertMaterial({ map: textures.jungleTreeSide }),
+      new THREE.MeshLambertMaterial({ map: textures.jungleTreeSide }),
+      new THREE.MeshLambertMaterial({ map: textures.jungleTreeTop }),
+      new THREE.MeshLambertMaterial({ map: textures.jungleTreeTop }),
+      new THREE.MeshLambertMaterial({ map: textures.jungleTreeSide }),
+      new THREE.MeshLambertMaterial({ map: textures.jungleTreeSide }),
+    ],
+  },
+  jungleLeaves: {
+    id: 12,
+    name: "jungleLeaves",
+    material: new THREE.MeshLambertMaterial({ map: textures.jungleLeaves }),
+  },
+  jungleGrass: {
+    id: 13,
+    name: "jungleGrass",
+    color: 0x55ca20,
+    material: [
+      //max 6 materials
+      new THREE.MeshLambertMaterial({ map: textures.jungleGrassSide }), //right
+      new THREE.MeshLambertMaterial({ map: textures.jungleGrassSide }), //left
+      new THREE.MeshLambertMaterial({ map: textures.jungleGrass }), //top
+      new THREE.MeshLambertMaterial({ map: textures.dirt }), //bot
+      new THREE.MeshLambertMaterial({ map: textures.jungleGrassSide }), //front
+      new THREE.MeshLambertMaterial({ map: textures.jungleGrassSide }), //back
+    ],
   },
 };
 
