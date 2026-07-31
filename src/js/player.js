@@ -48,6 +48,8 @@ export class Player {
   );
   selectedCoords = null;
 
+  toolbarSlots = [1, 2, 3, 4, 5, 6, 7, 8, blocks.empty.id];
+  activeSlot = 9;
   activeBlockId = blocks.empty.id;
 
   tool = new Tool();
@@ -103,6 +105,12 @@ export class Player {
     this.camera.add(this.underwaterOverlay);
 
     this.raycaster.layers.set(0);
+
+    document.addEventListener("wheel", this.onWheel.bind(this), {
+      passive: false,
+    });
+
+    this.selectToolbarSlot(this.activeSlot);
   }
 
   get worldVelocity() {
@@ -252,25 +260,32 @@ export class Player {
     }
 
     switch ($event.code) {
-      case "Digit0":
       case "Digit1":
+        this.selectToolbarSlot(1);
+        break;
       case "Digit2":
+        this.selectToolbarSlot(2);
+        break;
       case "Digit3":
+        this.selectToolbarSlot(3);
+        break;
       case "Digit4":
+        this.selectToolbarSlot(4);
+        break;
       case "Digit5":
+        this.selectToolbarSlot(5);
+        break;
       case "Digit6":
+        this.selectToolbarSlot(6);
+        break;
       case "Digit7":
+        this.selectToolbarSlot(7);
+        break;
       case "Digit8":
-        document
-          .getElementById(`toolbar-${this.activeBlockId}`)
-          .classList.remove("selected");
-        this.activeBlockId = Number($event.key);
-        document
-          .getElementById(`toolbar-${this.activeBlockId}`)
-          .classList.add("selected");
-
-        // show the tool only when the active block is not empty
-        this.tool.visible = this.activeBlockId === blocks.empty.id;
+        this.selectToolbarSlot(8);
+        break;
+      case "Digit9":
+        this.selectToolbarSlot(9);
         break;
       case "KeyW":
         this.input.z = this.maxSpeed;
@@ -339,6 +354,46 @@ export class Player {
         this.resetFov();
         break;
     }
+  }
+
+  /**
+   * Selects the toolbar slot and updates the active block.
+   * @param {number} slot
+   */
+  selectToolbarSlot(slot) {
+    const previous = document.getElementById(`toolbar-${this.activeSlot}`);
+    if (previous) previous.classList.remove("selected");
+
+    this.activeSlot = slot;
+    const blockId = this.toolbarSlots[slot - 1] ?? blocks.empty.id;
+    this.activeBlockId = blockId;
+
+    const next = document.getElementById(`toolbar-${this.activeSlot}`);
+    if (next) next.classList.add("selected");
+
+    this.tool.visible = this.activeBlockId === blocks.empty.id;
+  }
+
+  /**
+   * Selects the next or previous toolbar slot.
+   * @param {number} delta
+   */
+  cycleToolbarItem(delta) {
+    let index = this.activeSlot - 1;
+    index =
+      (index + delta + this.toolbarSlots.length) % this.toolbarSlots.length;
+    this.selectToolbarSlot(index + 1);
+  }
+
+  /**
+   * Handler for mouse wheel events to cycle inventory.
+   * @param {WheelEvent} event
+   */
+  onWheel(event) {
+    if (!this.controls.isLocked) return;
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? 1 : -1;
+    this.cycleToolbarItem(delta);
   }
 
   /**

@@ -8,7 +8,7 @@ export class World extends THREE.Group {
   // The number of chunks to render around the player.
   // If 0, only the chunk where the player is will be rendered.
   // If n > 0, adjacent chunks are rendered.
-  drawDistance = 3;
+  drawDistance = 6;
 
   // Separate chunks visually for debugging purposes.
   chunkSpacing = 0;
@@ -51,7 +51,7 @@ export class World extends THREE.Group {
     },
     clouds: {
       scale: 30,
-      density: 0,
+      density: 0.1,
     },
   };
 
