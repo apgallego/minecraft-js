@@ -8,7 +8,7 @@ export class World extends THREE.Group {
   // The number of chunks to render around the player.
   // If 0, only the chunk where the player is will be rendered.
   // If n > 0, adjacent chunks are rendered.
-  drawDistance = 6;
+  drawDistance = 3;
 
   // Separate chunks visually for debugging purposes.
   chunkSpacing = 0;
@@ -29,7 +29,7 @@ export class World extends THREE.Group {
     biomes: {
       scale: 200,
       variation: {
-        amplitude: 0.2,
+        amplitude: 0.4,
         scale: 50,
       },
       tundraToTemperate: 0.1,
@@ -43,11 +43,11 @@ export class World extends THREE.Group {
         maxHeight: 7,
       },
       canopy: {
-        minRadius: 2,
-        maxRadius: 4,
-        density: 0.5, //Vary between 0.0 and 1.0
+        minRadius: 3,
+        maxRadius: 3,
+        density: 0.7, //Vary between 0.0 and 1.0
       },
-      frequency: 0.01,
+      frequency: 0.005,
     },
     clouds: {
       scale: 30,

@@ -29,9 +29,9 @@ export class WorldChunk extends THREE.Group {
 
     const rng = new RNG(this.params.seed);
     this.initializeTerrain();
-    this.generateResources(rng);
+    // this.generateResources(rng);
     this.generateTerrain(rng);
-    this.generateTrees();
+    this.generateTree(rng);
     this.generateClouds(rng);
     this.loadPlayerChanges();
     this.generateMeshes();
@@ -100,77 +100,57 @@ export class WorldChunk extends THREE.Group {
     return "Desert";
   }
 
-  /**
-   * Generates resources like coal, stone, etc.
-   */
-  generateResources(rng) {
-    const simplex = new SimplexNoise(rng);
-    resources.forEach((resource) => {
-      for (let x = 0; x < this.size.width; x++) {
-        for (let y = 0; y < this.size.height; y++) {
-          for (let z = 0; z < this.size.width; z++) {
-            const value = simplex.noise3d(
-              (this.position.x + x) / resource.scale.x,
-              (this.position.y + y) / resource.scale.y,
-              (this.position.z + z) / resource.scale.z,
-            );
-            if (value > resource.scarcity) {
-              this.setBlockId(x, y, z, resource.id);
-            }
-          }
-        }
-      }
-    });
-  }
-
   generateTerrain(rng) {
     const simplex = new SimplexNoise(rng);
 
     for (let x = 0; x < this.size.width; x++) {
-      for (let y = 0; y < this.size.height; y++) {
-        for (let z = 0; z < this.size.width; z++) {
-          // Get the noise value at the x, z location.
-          const value = simplex.noise(
-            (this.position.x + x) / this.params.terrain.scale,
-            (this.position.z + z) / this.params.terrain.scale,
-          );
-          // Get the noise based on the magnitude/offset.
-          const scaledNoise =
-            this.params.terrain.offset + this.params.terrain.magnitude * value;
-          // Get the terrain height at x, z.
-          let height = Math.floor(scaledNoise);
-          height = Math.max(0, Math.min(height, this.size.height - 1));
+      for (let z = 0; z < this.size.width; z++) {
+        const biome = this.getBiome(simplex, x, z);
 
-          // Fill all blocks at or below the terrain height.
-          for (let y = 0; y <= this.size.height; y++) {
-            if (y <= this.params.terrain.waterOffset && y <= height) {
-              this.setBlockId(x, y, z, blocks.sand.id);
-            } else if (y === height) {
-              const biome = this.getBiome(simplex, x, z);
-              let groundBlockType;
-              switch (biome) {
-                case "Desert":
-                  groundBlockType = blocks.sand.id;
-                  break;
-                case "Temperate":
-                  groundBlockType = blocks.grass.id;
-                  break;
-                case "Jungle":
-                  groundBlockType = blocks.jungleGrass.id;
-                  break;
-                case "Tundra":
-                  groundBlockType = blocks.snow.id;
-                  break;
-              }
-              this.setBlockId(x, y, z, groundBlockType);
-            } else if (
-              y < height &&
-              this.getBlock(x, y, z).id === blocks.empty.id
-            ) {
-              this.setBlockId(x, y, z, blocks.dirt.id);
-            } else if (y > height) {
-              this.setBlockId(x, y, z, blocks.empty.id);
+        // Get the noise value at the x, z location.
+        const value = simplex.noise(
+          (this.position.x + x) / this.params.terrain.scale,
+          (this.position.z + z) / this.params.terrain.scale,
+        );
+        // Get the noise based on the magnitude/offset.
+        const scaledNoise =
+          this.params.terrain.offset + this.params.terrain.magnitude * value;
+        // Get the terrain height at x, z.
+        let height = Math.floor(scaledNoise);
+        height = Math.max(0, Math.min(height, this.size.height - 1));
+
+        // Fill all blocks at or below the terrain height.
+        for (let y = this.size.height; y >= 0; y--) {
+          if (y <= this.params.terrain.waterOffset && y === height) {
+            this.setBlockId(x, y, z, blocks.sand.id);
+          } else if (y === height) {
+            let groundBlockType;
+            switch (biome) {
+              case "Desert":
+                groundBlockType = blocks.sand.id;
+                break;
+              case "Temperate":
+                groundBlockType = blocks.grass.id;
+                break;
+              case "Jungle":
+                groundBlockType = blocks.jungleGrass.id;
+                break;
+              case "Tundra":
+                groundBlockType = blocks.snow.id;
+                break;
             }
+            this.setBlockId(x, y, z, groundBlockType);
+
+            if (rng.random() < this.params.trees.frequency) {
+              //Oak - Jungle - Cactus
+              this.generateTree(rng, biome, x, height, z);
+            }
+          } else if (
+            y < height &&
+            this.getBlock(x, y, z).id === blocks.empty.id
+          ) {
+            this.generateResourcesIfNeeded(simplex, x, y, z);
+            this.setBlockId(x, y, z, blocks.dirt.id);
           }
         }
       }
@@ -178,49 +158,80 @@ export class WorldChunk extends THREE.Group {
   }
 
   /**
-   * Populate the world with trees
+   * Determines if a resource should be generated at the given coordinates
+   * @param {SimplexNoise} simplex
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
    */
-  generateTrees() {
-    const generateTreeTrunk = (x, z, rng) => {
-      const minH = this.params.trees.trunk.minHeight;
-      const maxH = this.params.trees.trunk.maxHeight;
-      const h = Math.round(minH + (maxH - minH) * rng.random());
-
-      // Search for the grass block that marks the top of the terrain.
-      for (let y = 0; y < this.size.height; y++) {
-        const block = this.getBlock(x, y, z);
-        //grass block found
-        if (block && block.id === blocks.grass.id) {
-          //The trunk of the tree starts here
-          for (let treeY = y + 1; treeY <= y + h; treeY++) {
-            this.setBlockId(x, treeY, z, blocks.tree.id);
-          }
-
-          //generate canopy centered on top of the tree
-          generateTreeCanopy(x, y + h, z, rng);
-          break;
-        }
+  generateResourcesIfNeeded(simplex, x, y, z) {
+    resources.forEach((resource) => {
+      const value = simplex.noise3d(
+        (this.position.x + x) / resource.scale.x,
+        (this.position.y + y) / resource.scale.y,
+        (this.position.z + z) / resource.scale.z,
+      );
+      if (value > resource.scarcity) {
+        this.setBlockId(x, y, z, resource.id);
       }
-    };
+    });
+  }
 
-    const generateTreeCanopy = (centerX, centerY, centerZ, rng) => {
-      const minR = this.params.trees.canopy.minRadius;
-      const maxR = this.params.trees.canopy.maxRadius;
-      const r = Math.round(minR + (maxR - minR) * rng.random());
+  /**
+   * Creates a tree depending on the biome at x, y, z
+   * @param {RNG} rng
+   * @param {string} biome
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   */
+  generateTree(rng, biome, x, y, z) {
+    const minH = this.params.trees.trunk.minHeight;
+    const maxH = this.params.trees.trunk.maxHeight;
+    const h = Math.round(minH + (maxH - minH) * rng.random());
 
-      for (let x = -r; x <= r; x++) {
-        for (let y = -r; y <= r; y++) {
-          for (let z = -r; z <= r; z++) {
-            const n = rng.random();
-            // Make sure the block is within the canopy radius.
-            if (x * x + y * y + z * z > r * r) continue;
+    for (let treeY = y + 1; treeY <= y + h; treeY++) {
+      if (biome === "Temperate" || biome === "Tundra") {
+        this.setBlockId(x, treeY, z, blocks.tree.id);
+      } else if (biome === "Jungle") {
+        this.setBlockId(x, treeY, z, blocks.jungleTree.id);
+      } else if (biome === "Desert") {
+        this.setBlockId(x, treeY, z, blocks.cactus.id);
+      }
+    }
 
-            // don't overwrite an existing block
-            const block = this.getBlock(centerX + x, centerY + y, centerZ + z);
-            if (block && block.id !== blocks.empty.id) continue;
+    //generate canopy centered on top of the tree
+    if (biome === "Temperate" || biome === "Jungle") {
+      this.generateTreeCanopy(biome, x, y + h, z, rng);
+    }
+  }
 
-            //fill the tree canopy with leaves based on the density param
-            if (n < this.params.trees.canopy.density) {
+  generateTreeCanopy = (biome, centerX, centerY, centerZ, rng) => {
+    const minR = this.params.trees.canopy.minRadius;
+    const maxR = this.params.trees.canopy.maxRadius;
+    const r = Math.round(minR + (maxR - minR) * rng.random());
+
+    for (let x = -r; x <= r; x++) {
+      for (let y = -r; y <= r; y++) {
+        for (let z = -r; z <= r; z++) {
+          const n = rng.random();
+          // Make sure the block is within the canopy radius.
+          if (x * x + y * y + z * z > r * r) continue;
+
+          // don't overwrite an existing block
+          const block = this.getBlock(centerX + x, centerY + y, centerZ + z);
+
+          if (block && block.id !== blocks.empty.id) continue;
+          //fill the tree canopy with leaves based on the density param
+          if (n < this.params.trees.canopy.density) {
+            if (biome === "Temperate") {
+              this.setBlockId(
+                centerX + x,
+                centerY + y,
+                centerZ + z,
+                blocks.leaves.id,
+              );
+            } else if (biome === "Jungle") {
               this.setBlockId(
                 centerX + x,
                 centerY + y,
@@ -231,18 +242,8 @@ export class WorldChunk extends THREE.Group {
           }
         }
       }
-    };
-
-    let rng = new RNG(this.params.seed);
-    let offset = this.params.trees.canopy.maxRadius;
-    for (let x = offset; x < this.size.width - offset; x++) {
-      for (let z = offset; z < this.size.width - offset; z++) {
-        if (rng.random() < this.params.trees.frequency) {
-          generateTreeTrunk(x, z, rng);
-        }
-      }
     }
-  }
+  };
 
   /**
    * Creates clouds

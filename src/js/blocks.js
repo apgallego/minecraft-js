@@ -28,6 +28,8 @@ export const textures = {
   jungleLeaves: loadTexture("textures/jungle_leaves.png"),
   jungleGrass: loadTexture("textures/jungle_grass.png"),
   jungleGrassSide: loadTexture("textures/jungle_grass_side.png"),
+  cactusTop: loadTexture("textures/cactus_top.png"),
+  cactusSide: loadTexture("textures/cactus_side.png"),
 };
 
 export const blocks = {
@@ -160,6 +162,18 @@ export const blocks = {
       new THREE.MeshLambertMaterial({ map: textures.dirt }), //bot
       new THREE.MeshLambertMaterial({ map: textures.jungleGrassSide }), //front
       new THREE.MeshLambertMaterial({ map: textures.jungleGrassSide }), //back
+    ],
+  },
+  cactus: {
+    id: 14,
+    name: "cactus",
+    material: [
+      new THREE.MeshLambertMaterial({ map: textures.cactusSide }),
+      new THREE.MeshLambertMaterial({ map: textures.cactusSide }),
+      new THREE.MeshLambertMaterial({ map: textures.cactusTop }),
+      new THREE.MeshLambertMaterial({ map: textures.cactusTop }),
+      new THREE.MeshLambertMaterial({ map: textures.cactusSide }),
+      new THREE.MeshLambertMaterial({ map: textures.cactusSide }),
     ],
   },
 };
