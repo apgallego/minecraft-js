@@ -29,9 +29,7 @@ export class WorldChunk extends THREE.Group {
 
     const rng = new RNG(this.params.seed);
     this.initializeTerrain();
-    // this.generateResources(rng);
     this.generateTerrain(rng);
-    this.generateTree(rng);
     this.generateClouds(rng);
     this.loadPlayerChanges();
     this.generateMeshes();
@@ -102,6 +100,10 @@ export class WorldChunk extends THREE.Group {
 
   generateTerrain(rng) {
     const simplex = new SimplexNoise(rng);
+    const margin = 4; // do not place trees within this many blocks of chunk edges
+    const treeMap = Array.from({ length: this.size.width }, () =>
+      new Array(this.size.width).fill(false),
+    );
 
     for (let x = 0; x < this.size.width; x++) {
       for (let z = 0; z < this.size.width; z++) {
@@ -141,16 +143,36 @@ export class WorldChunk extends THREE.Group {
             }
             this.setBlockId(x, y, z, groundBlockType);
 
-            if (rng.random() < this.params.trees.frequency) {
-              //Oak - Jungle - Cactus
-              this.generateTree(rng, biome, x, height, z);
+            const isTreeNeighbor =
+              treeMap[x - 1]?.[z] ||
+              treeMap[x + 1]?.[z] ||
+              treeMap[x]?.[z - 1] ||
+              treeMap[x]?.[z + 1] ||
+              treeMap[x - 1]?.[z - 1] ||
+              treeMap[x - 1]?.[z + 1] ||
+              treeMap[x + 1]?.[z - 1] ||
+              treeMap[x + 1]?.[z + 1];
+
+            const treeRng = this.getTreeRng(x, z);
+            if (
+              treeRng.random() < this.params.trees.frequency &&
+              x >= margin &&
+              x < this.size.width - margin &&
+              z >= margin &&
+              z < this.size.width - margin &&
+              !isTreeNeighbor
+            ) {
+              //Oak - Jungle - Cactus (only if not near chunk edge)
+              treeMap[x][z] = true;
+              const treeHeight = this.getTreeHeight(treeRng);
+              this.generateTree(rng, biome, x, height, z, treeHeight);
             }
           } else if (
             y < height &&
             this.getBlock(x, y, z).id === blocks.empty.id
           ) {
-            this.generateResourcesIfNeeded(simplex, x, y, z);
-            this.setBlockId(x, y, z, blocks.dirt.id);
+            const placed = this.generateResourcesIfNeeded(simplex, x, y, z);
+            if (!placed) this.setBlockId(x, y, z, blocks.dirt.id);
           }
         }
       }
@@ -165,6 +187,7 @@ export class WorldChunk extends THREE.Group {
    * @param {number} z
    */
   generateResourcesIfNeeded(simplex, x, y, z) {
+    let placed = false;
     resources.forEach((resource) => {
       const value = simplex.noise3d(
         (this.position.x + x) / resource.scale.x,
@@ -173,8 +196,34 @@ export class WorldChunk extends THREE.Group {
       );
       if (value > resource.scarcity) {
         this.setBlockId(x, y, z, resource.id);
+        placed = true;
       }
     });
+    return placed;
+  }
+
+  /**
+   * Creates a local RNG for a tree candidate at the given coordinates.
+   * @param {number} x
+   * @param {number} z
+   */
+  getTreeRng(x, z) {
+    const seed = this.params.seed || 0;
+    const coordSeed =
+      ((this.position.x + x) * 73428767) ^
+      ((this.position.z + z) * 91278431) ^
+      (seed * 1664525);
+    return new RNG(coordSeed);
+  }
+
+  /**
+   * Returns a tree height using the tree's local RNG.
+   * @param {RNG} rng
+   */
+  getTreeHeight(rng) {
+    const minH = this.params.trees.trunk.minHeight;
+    const maxH = this.params.trees.trunk.maxHeight;
+    return Math.round(minH + (maxH - minH) * rng.random());
   }
 
   /**
@@ -184,11 +233,10 @@ export class WorldChunk extends THREE.Group {
    * @param {number} x
    * @param {number} y
    * @param {number} z
+   * @param {number} treeHeight
    */
-  generateTree(rng, biome, x, y, z) {
-    const minH = this.params.trees.trunk.minHeight;
-    const maxH = this.params.trees.trunk.maxHeight;
-    const h = Math.round(minH + (maxH - minH) * rng.random());
+  generateTree(rng, biome, x, y, z, treeHeight) {
+    const h = treeHeight;
 
     for (let treeY = y + 1; treeY <= y + h; treeY++) {
       if (biome === "Temperate" || biome === "Tundra") {

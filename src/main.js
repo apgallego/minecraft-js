@@ -28,7 +28,9 @@ const orbitCamera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
 );
-orbitCamera.position.set(-20, -20, -20);
+// Position the orbit camera overhead so the world is visible from above on load.
+orbitCamera.position.set(16, 40, 106);
+orbitCamera.lookAt(10, 0, 16);
 orbitCamera.layers.enable(1);
 // This is an HTML element, not an element of the actual camera.
 const crosshair = document.getElementById("crosshair");
@@ -42,7 +44,7 @@ controls.update();
  * Scene setup
  */
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x80a0e0, 50, 160);
+scene.fog = new THREE.Fog(0x80a0e0, 40, 120);
 const world = new World();
 world.generate(true);
 scene.add(world);
@@ -62,7 +64,7 @@ const sun = new THREE.DirectionalLight();
 const setupLights = () => {
   sun.position.set(50, 50, 50);
   // Reduce sun intensity for lighter shadows.
-  sun.intensity = 1.1; // 0.6 - 1.2
+  sun.intensity = 0.8; // 0.6 - 1.2
   sun.castShadow = true;
   sun.shadow.camera.left = -100;
   sun.shadow.camera.right = 100;
@@ -132,6 +134,7 @@ const animate = () => {
     sun.target.position.copy(player.position);
   }
   toggleCrosshair(player.controls.isLocked);
+  updateToolbarVisibility();
 
   renderer.render(
     scene,
@@ -151,6 +154,28 @@ window.addEventListener("resize", () => {
 
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+const overlay = document.querySelector(".overlay");
+const toolbarContainer = document.getElementById("toolbar-container");
+
+const hideOverlay = () => {
+  overlay?.classList.add("hidden");
+};
+
+document.addEventListener("keydown", () => {
+  if (overlay && !overlay.classList.contains("hidden")) {
+    hideOverlay();
+  }
+});
+
+const updateToolbarVisibility = () => {
+  if (!toolbarContainer) return;
+  if (player.controls.isLocked) {
+    toolbarContainer.style.display = "flex";
+  } else {
+    toolbarContainer.style.display = "none";
+  }
+};
 
 const toggleCrosshair = (controlsLocked) => {
   if (controlsLocked) crosshair.style.display = "inline";

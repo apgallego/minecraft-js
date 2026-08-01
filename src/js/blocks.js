@@ -62,7 +62,7 @@ export const blocks = {
     name: "stone",
     color: 0x808080,
     scale: { x: 30, y: 30, z: 30 },
-    scarcity: 0.5,
+    scarcity: 0.15,
     material: new THREE.MeshLambertMaterial({ map: textures.stone }),
   },
   coalOre: {
@@ -77,8 +77,8 @@ export const blocks = {
     id: 5,
     name: "ironOre",
     color: 0x806060,
-    scale: { x: 60, y: 60, z: 60 },
-    scarcity: 0.8,
+    scale: { x: 30, y: 30, z: 30 },
+    scarcity: 0.9,
     material: new THREE.MeshLambertMaterial({ map: textures.ironOre }),
   },
   tree: {

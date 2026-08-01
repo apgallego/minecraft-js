@@ -47,7 +47,7 @@ export class World extends THREE.Group {
         maxRadius: 3,
         density: 0.7, //Vary between 0.0 and 1.0
       },
-      frequency: 0.005,
+      frequency: 0.015,
     },
     clouds: {
       scale: 30,
