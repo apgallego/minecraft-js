@@ -28,5 +28,5 @@ This project is inspired by the work of Dan Greenheck, and it keeps the original
 ## Live Demo 🚀⚡
 
 - https://apgallego.github.io/minecraft-js/
-  ![Landing Page](live-demo-1.png)
+  [Landing Page](live-demo-1.png)
   ![In-Game Screenshot](live-demo-2.png)
