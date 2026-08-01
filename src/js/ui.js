@@ -4,6 +4,9 @@ import { resources } from "./blocks.js";
 export function createUI(scene, world, player, physics) {
   const gui = new GUI();
   gui.domElement.style.display = "none";
+  gui.domElement.style.top = "12px";
+  gui.domElement.style.right = "88px";
+  gui.domElement.style.left = "auto";
 
   const sceneFolder = gui.addFolder("Scene");
   sceneFolder.add(scene.fog, "near", 1, 200, 1).name("Fog Near");

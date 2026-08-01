@@ -47,6 +47,25 @@
     </style>
     <div id="crosshair"></div>
 
+    <button
+      id="ui-toggle-button"
+      class="ui-toggle-button"
+      type="button"
+      aria-label="Toggle GUI"
+      onclick="
+        document.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: 'u',
+            code: 'KeyU',
+            bubbles: true,
+            cancelable: true,
+          }),
+        )
+      "
+    >
+      <span aria-hidden="true">⚙️</span>
+    </button>
+
     <div id="app"></div>
 
     <div class="overlay">
