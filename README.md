@@ -7,6 +7,12 @@ This project is inspired by the work of Dan Greenheck, and it keeps the original
 - https://github.com/dgreenheck/minecraft-threejs-clone
 - https://www.youtube.com/watch?v=tsOTCn0nROI&list=PLtzt35QOXmkKALLv9RzT8oGwN5qwmRjTo
 
+## Live Demo 🚀⚡
+
+- https://apgallego.github.io/minecraft-js/
+  ![Landing Page](live-demo-1.png)
+  ![In-Game Screenshot](live-demo-2.png)
+
 ## Features ⚙️​🔧
 
 - Ability to change the world seed, player or generation parameters using the GUI (press "U" key)
@@ -24,9 +30,3 @@ This project is inspired by the work of Dan Greenheck, and it keeps the original
 - Reduced movement speed underwater
 - World saving to local storage
 - Loading the saved world from local storage
-
-## Live Demo 🚀⚡
-
-- https://apgallego.github.io/minecraft-js/
-  [Landing Page](live-demo-1.png)
-  ![In-Game Screenshot](live-demo-2.png)
