@@ -31,9 +31,29 @@
 }
 
 .overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   font-size: 2.5rem;
   margin-bottom: 12px;
   letter-spacing: 0.1em;
+}
+
+.overlay-header button {
+  border: 0;
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.overlay-header button:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .overlay-panel {

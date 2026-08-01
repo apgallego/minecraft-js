@@ -157,6 +157,7 @@ window.addEventListener("resize", () => {
 
 const overlay = document.querySelector(".overlay");
 const toolbarContainer = document.getElementById("toolbar-container");
+const closeButton = document.getElementById("overlay-close-btn");
 
 const showOverlay = () => {
   overlay?.classList.remove("hidden");
@@ -165,9 +166,16 @@ const showOverlay = () => {
   }
 };
 
-const hideOverlay = () => {
-  overlay?.classList.add("hidden");
+const hideOverlay = (event) => {
+  if (!overlay || overlay.classList.contains("hidden")) return;
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  overlay.classList.add("hidden");
 };
+
+closeButton?.addEventListener("click", hideOverlay);
 
 const showGui = () => {
   gui?.domElement.style.setProperty("display", "block", "important");
