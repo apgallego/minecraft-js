@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { WorldChunk } from "./worldChunk";
-import { DataStore } from "./datastore";
+import { WorldChunk } from "./worldChunk.js";
+import { DataStore } from "./dataStore.js";
 
 export class World extends THREE.Group {
   asyncLoading = true; //for chunks

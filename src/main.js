@@ -158,15 +158,59 @@ window.addEventListener("resize", () => {
 const overlay = document.querySelector(".overlay");
 const toolbarContainer = document.getElementById("toolbar-container");
 
+const showOverlay = () => {
+  overlay?.classList.remove("hidden");
+  if (overlay) {
+    overlay.style.display = "flex";
+  }
+};
+
 const hideOverlay = () => {
   overlay?.classList.add("hidden");
 };
 
-document.addEventListener("keydown", () => {
-  if (overlay && !overlay.classList.contains("hidden")) {
-    hideOverlay();
-  }
-});
+const showGui = () => {
+  gui?.domElement.style.setProperty("display", "block", "important");
+};
+
+const hideGui = () => {
+  gui?.domElement.style.setProperty("display", "none", "important");
+};
+
+const toggleGui = () => {
+  if (!gui) return;
+  const current = gui.domElement.style.display;
+  gui.domElement.style.setProperty(
+    "display",
+    current === "none" || current === "" ? "block" : "none",
+    "important",
+  );
+};
+
+document.addEventListener(
+  "keydown",
+  ($event) => {
+    if ($event.code === "KeyU") {
+      if (overlay && !overlay.classList.contains("hidden")) {
+        hideOverlay();
+        showGui();
+      } else {
+        toggleGui();
+      }
+      $event.stopPropagation();
+      $event.preventDefault();
+      return;
+    }
+
+    if (overlay && !overlay.classList.contains("hidden")) {
+      hideOverlay();
+      $event.stopPropagation();
+      $event.preventDefault();
+      return;
+    }
+  },
+  { capture: true },
+);
 
 const updateToolbarVisibility = () => {
   if (!toolbarContainer) return;
@@ -184,5 +228,5 @@ const toggleCrosshair = (controlsLocked) => {
 
 // -- init --
 setupLights();
-createUI(scene, world, player, physics);
+const gui = createUI(scene, world, player, physics);
 animate();

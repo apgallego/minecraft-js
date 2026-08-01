@@ -8,7 +8,7 @@ export class ModelLoader {
   };
 
   loadModels(onLoad) {
-    this.loader.load("/models/minecraft_pickaxe.glb", (model) => {
+    this.loader.load("./models/minecraft_pickaxe.glb", (model) => {
       const mesh = model.scene;
       this.models.pickaxe = mesh;
       onLoad(this.models);

@@ -3,6 +3,7 @@ import { resources } from "./blocks.js";
 
 export function createUI(scene, world, player, physics) {
   const gui = new GUI();
+  gui.domElement.style.display = "none";
 
   const sceneFolder = gui.addFolder("Scene");
   sceneFolder.add(scene.fog, "near", 1, 200, 1).name("Fog Near");
@@ -87,4 +88,6 @@ export function createUI(scene, world, player, physics) {
   gui.onChange(() => {
     world.generate(true);
   });
+
+  return gui;
 }
