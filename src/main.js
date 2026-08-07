@@ -157,6 +157,7 @@ window.addEventListener("resize", () => {
 
 const overlay = document.querySelector(".overlay");
 const toolbarContainer = document.getElementById("toolbar-container");
+const fullscreenButton = document.getElementById("fullscreen-button");
 
 const showOverlay = () => {
   overlay?.classList.remove("hidden");
@@ -225,6 +226,23 @@ const toggleCrosshair = (controlsLocked) => {
   if (controlsLocked) crosshair.style.display = "inline";
   else crosshair.style.display = "none";
 };
+
+const toggleFullscreen = async () => {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch (error) {
+    console.warn("Fullscreen toggle failed", error);
+  }
+  fullscreenButton?.blur();
+};
+
+if (fullscreenButton) {
+  fullscreenButton.addEventListener("click", toggleFullscreen);
+}
 
 // -- init --
 setupLights();
